@@ -11,7 +11,7 @@ The cost attribution dashboard seeks to provide a common view of Account trends 
 * Cluster Name:: Based on Dataset, Dynamic list of Cluster Names associated with Queries
 * Tag Name & Value: defaults to all tags.  Filter requires Tag Name and Value to see costs associated with tagged workloads.
 
-Last Updated: 5/22/2024
+Last Updated: 6/21/2024
 
 #### Authors
 Samer E. Zabaneh
