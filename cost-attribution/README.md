@@ -1,7 +1,7 @@
 # Databricks Cost Attribution
 
 ## Cost Attribution Dashboard:
-The cost attribution dashboard seeks to provide a common view of Account trends and drill down into Workspaces, Skus, Tags, and Users.
+The cost attribution dashboard seeks to provide a common view of Account trends and drill down into Workspaces, Skus, Tags, and Users. All the data are sourced from system tables.
 
 ### Filters & Parameters:
 * Date Range: An additional filter on top of Duration can be used to get a more granular view on top of the default duration
