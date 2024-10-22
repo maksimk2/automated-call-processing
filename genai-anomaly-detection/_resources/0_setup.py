@@ -42,7 +42,7 @@ import os
 import requests
 
 # Define the URL of the file you want to download
-git_url = 'https://raw.githubusercontent.com/databricks-solutions/databricks-blogposts/main/genai-anomaly-detection/purchase_vendors_products_synthetic.csv'
+git_url = 'https://raw.githubusercontent.com/databricks-solutions/databricks-blogposts/main/genai-anomaly-detection/data/purchase_vendors_products_synthetic.csv'
 
 # Define the local path where you want to save the file
 local_path = config['vol_data_landing'] + '/purchase_vendors_products_synthetic.csv'
