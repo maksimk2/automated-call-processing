@@ -4,7 +4,7 @@ This repository contains the code accompanying the blog [Anomaly detection using
 <br>In this blog, we explore how machine learning techniques, particularly leveraging embeddings and large language models (LLMs), can improve fraud detection by identifying outliers and patterns that are otherwise difficult to spot. 
 <br>The code demonstrates the different approaches discussed and provides implementations for each technique.
 
-[pipeline_emb.png](./data/pipeline_emb.png "pipeline_emb.png")
+![pipeline_emb.png](./data/pipeline_emb.png "pipeline_emb.png")
 
 ## Code
 
