@@ -1,10 +1,11 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # AWS Databricks + Power BI SSO
-# MAGIC <img src="https://github.com/baatch/awsdb-pbi-sso/blob/main/docs/title_logo.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
+# MAGIC <img src="https://github.com/databricks-solutions/databricks-blogposts/blob/main/docs/title_logo.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
 # MAGIC
 # MAGIC In this demo, you'll learn how to use AWS Databricks and Power BI SSO to harness the power of Unity Catalog to secure your data at a more granular level using its *row-level* and *column-level* access control capabilities.
 # MAGIC
+
 
 # COMMAND ----------
 
@@ -104,11 +105,11 @@
 # MAGIC - Go to Power BI Service and check the semantic model data source credentials and verify that the setting **"Report viewer can only access this data source with their own Power BI identities using DirectQuery."** is available and configured.
 # MAGIC
 # MAGIC
-# MAGIC <img src="https://github.com/baatch/awsdb-pbi-sso/blob/main/docs/pbi_desktop_template.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
+# MAGIC <img src="https://github.com/databricks-solutions/databricks-blogposts/blob/main/docs/pbi_desktop_template.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
 # MAGIC
 # MAGIC <br>
 # MAGIC <br>
-# MAGIC <img src="https://github.com/baatch/awsdb-pbi-sso/blob/main/docs/pbi_semantic.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
+# MAGIC <img src="https://github.com/databricks-solutions/databricks-blogposts/blob/main/docs/pbi_semantic.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
 # MAGIC
 # MAGIC
 # MAGIC
@@ -134,7 +135,7 @@
 # MAGIC - Build some visuals
 # MAGIC - Save the report and Publish to Power BI Service. 
 # MAGIC
-# MAGIC <img src="https://github.com/baatch/awsdb-pbi-sso/blob/main/docs/pbi.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
+# MAGIC <img src="https://github.com/databricks-solutions/databricks-blogposts/blob/main/docs/pbi.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
 
 # COMMAND ----------
 
@@ -291,7 +292,7 @@
 # MAGIC - Switch to Power BI Service and refresh the Power BI report. 
 # MAGIC - Verify that RLS and CLS has kicked in
 # MAGIC
-# MAGIC <img src="https://github.com/baatch/awsdb-pbi-sso/blob/main/docs/pbi_service_rls.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
+# MAGIC <img src="https://github.com/databricks-solutions/databricks-blogposts/blob/main/docs/pbi_service_rls.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
 # MAGIC
 # MAGIC
 # MAGIC
@@ -307,7 +308,7 @@
 # MAGIC
 # MAGIC <br>
 # MAGIC
-# MAGIC <img src="https://github.com/baatch/awsdb-pbi-sso/blob/main/docs/query_history.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
+# MAGIC <img src="https://github.com/databricks-solutions/databricks-blogposts/blob/main/docs/query_history.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
 
 # COMMAND ----------
 
