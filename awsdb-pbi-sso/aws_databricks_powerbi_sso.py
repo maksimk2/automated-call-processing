@@ -1,7 +1,7 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # AWS Databricks + Power BI SSO
-# MAGIC <img src="https://github.com/databricks-solutions/databricks-blogposts/blob/main/docs/title_logo.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
+# MAGIC <img src="docs/title_logo.png" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
 # MAGIC
 # MAGIC In this demo, you'll learn how to use AWS Databricks and Power BI SSO to harness the power of Unity Catalog to secure your data at a more granular level using its *row-level* and *column-level* access control capabilities.
 # MAGIC
@@ -105,11 +105,11 @@
 # MAGIC - Go to Power BI Service and check the semantic model data source credentials and verify that the setting **"Report viewer can only access this data source with their own Power BI identities using DirectQuery."** is available and configured.
 # MAGIC
 # MAGIC
-# MAGIC <img src="https://github.com/databricks-solutions/databricks-blogposts/blob/main/docs/pbi_desktop_template.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
+# MAGIC <img src="docs/pbi_desktop_template.png" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
 # MAGIC
 # MAGIC <br>
 # MAGIC <br>
-# MAGIC <img src="https://github.com/databricks-solutions/databricks-blogposts/blob/main/docs/pbi_semantic.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
+# MAGIC <img src="docs/pbi_semantic.png" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
 # MAGIC
 # MAGIC
 # MAGIC
@@ -135,7 +135,7 @@
 # MAGIC - Build some visuals
 # MAGIC - Save the report and Publish to Power BI Service. 
 # MAGIC
-# MAGIC <img src="https://github.com/databricks-solutions/databricks-blogposts/blob/main/docs/pbi.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
+# MAGIC <img src="docs/pbi.png" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
 
 # COMMAND ----------
 
@@ -161,7 +161,7 @@
 # MAGIC
 # MAGIC ## Row level access control 
 # MAGIC
-# MAGIC <img src="https://github.com/databricks-demos/dbdemos-resources/blob/main/images/product/uc/acls/table_uc_rls.png?raw=true" width="200" style="float: right; margin-top: 20; margin-right: 20" alt="databricks-demos"/>
+# MAGIC <img src="docs/table_uc_rls.png" width="200" style="float: right; margin-top: 20; margin-right: 20" alt="databricks-demos"/>
 # MAGIC
 # MAGIC Row-level security allows you to automatically hide a subset of your rows based on who is attempting to query it, without having to maintain any seperate copies of your data.
 # MAGIC
@@ -215,7 +215,7 @@
 # MAGIC Similarly, column-level access control helps you mask or anonymise the data that is in certain columns of your table, depending on the user or service principal that is trying to access it. This is typically used to mask or remove sensitive PII informations from your end users (email, SSN...).
 # MAGIC <br>
 # MAGIC
-# MAGIC <img src="https://github.com/databricks-demos/dbdemos-resources/blob/main/images/product/uc/acls/table_uc_cls.png?raw=true" width="200" style="float: right; margin-top: 20; margin-right: 20; margin-left: 20" alt="databricks-demos"/>
+# MAGIC <img src="docs/table_uc_cls.png" width="200" style="float: right; margin-top: 20; margin-right: 20; margin-left: 20" alt="databricks-demos"/>
 # MAGIC
 # MAGIC
 
@@ -251,10 +251,10 @@
 # MAGIC
 # MAGIC <br>
 # MAGIC
-# MAGIC <img src="https://github.com/databricks-demos/dbdemos-resources/blob/main/images/product/uc/acls/table_uc_cls.png?raw=true" width="200" style="float: right; margin-top: 20; margin-right: 20; margin-left: 20" alt="databricks-demos"/>
+# MAGIC <img src="docs/table_uc_cls.png" width="200" style="float: right; margin-top: 20; margin-right: 20; margin-left: 20" alt="databricks-demos"/>
 # MAGIC
 # MAGIC
-# MAGIC <img src="https://github.com/databricks-demos/dbdemos-resources/blob/main/images/product/uc/acls/table_uc_rls.png?raw=true" width="200" style="float: right; margin-top: 20; margin-right: 20" alt="databricks-demos"/>
+# MAGIC <img src="docs/table_uc_rls.png" width="200" style="float: right; margin-top: 20; margin-right: 20" alt="databricks-demos"/>
 # MAGIC
 # MAGIC <br>
 # MAGIC <br>
@@ -292,7 +292,7 @@
 # MAGIC - Switch to Power BI Service and refresh the Power BI report. 
 # MAGIC - Verify that RLS and CLS has kicked in
 # MAGIC
-# MAGIC <img src="https://github.com/databricks-solutions/databricks-blogposts/blob/main/docs/pbi_service_rls.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
+# MAGIC <img src="docs/pbi_service_rls.png" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
 # MAGIC
 # MAGIC
 # MAGIC
@@ -308,7 +308,7 @@
 # MAGIC
 # MAGIC <br>
 # MAGIC
-# MAGIC <img src="https://github.com/databricks-solutions/databricks-blogposts/blob/main/docs/query_history.png?raw=true" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
+# MAGIC <img src="docs/query_history.png" width="400" style="float: right; margin-top: 20; margin-right: 20" alt="A"/>
 
 # COMMAND ----------
 
