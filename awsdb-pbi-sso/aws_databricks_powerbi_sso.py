@@ -322,11 +322,11 @@
 # DBTITLE 1,Remove Row Filter from Customers Table
 # MAGIC %sql
 # MAGIC -- Remove row filter on the 'customers' table
-# MAGIC ALTER TABLE customers DROP ROW FILTER;
+# MAGIC ALTER TABLE ${catalog}.${schema}.customers DROP ROW FILTER;
 
 # COMMAND ----------
 
 # DBTITLE 1,Removing column mask on address
 # MAGIC %sql
 # MAGIC -- Removing the column mask on 'address' from the 'customers' table
-# MAGIC ALTER TABLE customers ALTER COLUMN address DROP MASK;
+# MAGIC ALTER TABLE ${catalog}.${schema}.customers ALTER COLUMN address DROP MASK;
