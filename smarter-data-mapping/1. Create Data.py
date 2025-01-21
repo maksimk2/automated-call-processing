@@ -1,4 +1,34 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC # Create Simulated Dataset for Taxonomy Consolidation
+# MAGIC
+# MAGIC This notebook creates a simulated dataset that can be used for demonstrating the taxonomy consolidation workflows outlined in the other notebooks. This is performed in the following steps:
+# MAGIC
+# MAGIC 1. **Mapping Delivery Unit Names with Noise**:
+# MAGIC    - Define example lists for `SOURCE_DIM`, `REGION_NAME`, `ROUTE_NAME`, and `DELIVERY_UNIT_NAME`.
+# MAGIC    - Create a mapping dictionary to map original delivery unit names to names with noise.
+# MAGIC
+# MAGIC 2. **Generate and Display Unique Combinations in Finance System**:
+# MAGIC    - Generate unique combinations of `REGION_NAME`, `ROUTE_NAME`, and `DELIVERY_UNIT_NAME`.
+# MAGIC    - Convert the combinations to a Pandas DataFrame and then to a Spark DataFrame.
+# MAGIC    - Add a `SOURCE_DIM` column with the value "Finance_System".
+# MAGIC    - Display the resulting Spark DataFrame.
+# MAGIC
+# MAGIC 3. **Create Final Taxonomy Column**:
+# MAGIC    - Load a table into a DataFrame.
+# MAGIC    - Add a new column by concatenating `REGION_NAME`, `ROUTE_NAME`, and `DELIVERY_UNIT_NAME`.
+# MAGIC    - Filter the DataFrame to include only rows where `SOURCE_DIM` is "Finance_System".
+# MAGIC    - Write the original and modified DataFrames to Delta tables.
+# MAGIC    - Display the modified DataFrame.
+
+# COMMAND ----------
+
+# DBTITLE 1,Load Config File
+# MAGIC %run "./_resources/00-init" 
+
+# COMMAND ----------
+
+# DBTITLE 1,Mapping Delivery Unit Names with Noise
 # SOURCE_DIM examples
 SOURCE_DIM = [
     "Finance_System",
@@ -124,6 +154,7 @@ delivery_unit_mapping = dict(zip(DELIVERY_UNIT_NAME_ORIGINAL, DELIVERY_UNIT_NAME
 
 # COMMAND ----------
 
+# DBTITLE 1,Generate and Display Unique Combinations in Finance System
 import pandas as pd
 import numpy as np
 import pyspark.sql.functions as F
@@ -150,6 +181,7 @@ display(finance_spark_df)
 
 # COMMAND ----------
 
+# DBTITLE 1,Split DataFrame, Add Source Column and Display
 # Split the dataframe into two parts, A with 20 rows and B with 30 rows
 procurement_spark_df, partner_spark_df = taxonomy_spark_df.randomSplit([2.0, 3.0])
 
@@ -163,6 +195,7 @@ display(other_spark_df)
 
 # COMMAND ----------
 
+# DBTITLE 1,Map and Display Updated Delivery Unit Names
 from pyspark.sql.functions import coalesce, create_map, lit
 from itertools import chain
 
@@ -179,6 +212,7 @@ display(other_spark_df)
 
 # COMMAND ----------
 
+# DBTITLE 1,Combine DataFrames and Add Unique ID
 from pyspark.sql.functions import monotonically_increasing_id
 
 # Concatenate spark_finance_df and spark_other_df
@@ -191,17 +225,16 @@ display(combined_df_with_id)
 
 # COMMAND ----------
 
-catalog = "mzervou"
-schema = "taxonomy_blog"
+# DBTITLE 1,Save DataFrame to Delta Table in Unity Catalog
 table_name = "raw_supplier_dummy_data"
 
-
 # Save the DataFrame to Unity Catalog as a Delta table
-table_path = f"{catalog}.{schema}.{table_name}"
+table_path = f"{catalog}.{db}.{table_name}"
 combined_df_with_id.write.format("delta").mode("overwrite").saveAsTable(table_path)
 
 # COMMAND ----------
 
+# DBTITLE 1,Create Final Taxonomy Column
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import concat_ws, col
 
@@ -212,16 +245,12 @@ r_df = spark.read.table(table_path)
 df = r_df.withColumn("final_taxonomy_column", concat_ws("|", 'REGION_NAME', 'ROUTE_NAME', 'DELIVERY_UNIT_NAME'))
 df = df.filter(col("SOURCE_DIM") == "Finance_System")
 
-# Define the table name and the path for saving the DataFrame as a Delta table
-raw_table_name = "raw_supplier_dummy_taxonomy_data"
-conformed_table_name = "conformed_supplier_dummy_taxonomy_data"
-
-raw_delta_table_path = f"{catalog}.{schema}.{raw_table_name}"
-conformed_delta_table_path = f"{catalog}.{schema}.{conformed_table_name}"
+raw_delta_table_path = f"{catalog}.{db}.{raw_table_name}"
+conformed_delta_table_path = f"{catalog}.{db}.{conformed_table_name}"
 
 # Write the DataFrame to a Delta table, overwriting any existing data
-r_df.write.format("delta").mode("overwrite").saveAsTable(raw_delta_table_path)
-df.write.format("delta").mode("overwrite").saveAsTable(conformed_delta_table_path)
+r_df.write.format("delta").mode("overwrite").saveAsTable(cleaned_table_name)
+df.write.format("delta").mode("overwrite").saveAsTable(conformed_table_name)
 
 # Display the DataFrame
 display(df)

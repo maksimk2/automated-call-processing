@@ -13,7 +13,7 @@
 VECTOR_SEARCH_ENDPOINT_NAME="taxonomy_blog_endpoint"
 
 # catalog specifies the name of the Databricks catalog where the data is stored.
-catalog = "mzervou"
+catalog = "main"
 # db specifies the name of the database within the catalog.
 db = "taxonomy_blog"
 # cleaned_table_name is the name of the table containing the raw data that needs to be cleaned or processed.
