@@ -137,7 +137,7 @@ Please ensure that all code contributions follow the relevant guidelines for sty
 ## Support
 
 For issues or questions:
-- Contact your Databricks representative or open a support ticket in the [Databricks Help Center](https://help.databricks.com/s/).  
+- This content is community based and not supported by Databricks.
 - For open-source library inquiries, please check the respective library’s GitHub issues or documentation.  
 
 **Happy Consolidating!**
