@@ -60,9 +60,11 @@ DATABRICKS_SITEMAP_URL = "https://docs.databricks.com/en/doc-sitemap.xml"
 # MAGIC | textstat      | [MIT](https://pypi.org/project/textstat/)     |
 # MAGIC | tiktoken      | [MIT](https://github.com/openai/tiktoken/blob/main/LICENSE)     |
 # MAGIC | evaluate      | [Apache 2.0](https://pypi.org/project/evaluate/)     |
-# MAGIC | torch      | [BDS-3](https://github.com/intel/torch/blob/master/LICENSE.md)     |
+# MAGIC | torch      | [BSS-3](https://github.com/intel/torch/blob/master/LICENSE.md)     |
 # MAGIC | pytesseract      | [Apache 2.0](https://pypi.org/project/pytesseract/)     |
-# MAGIC | pytesseract      | [Apache 2.0](https://pypi.org/project/pytesseract/)     |
+# MAGIC | pillow      | [MIT-CMU](https://github.com/python-pillow/Pillow?tab=License-1-ov-file#readme)     |
+# MAGIC | pypdf      | [BSD-3](https://github.com/py-pdf/pypdf?tab=License-1-ov-file#readme)     |
+# MAGIC | llama-index      | [MIT](https://github.com/run-llama/llama_index?tab=MIT-1-ov-file#readme)     |
 # MAGIC
 # MAGIC
 # MAGIC
