@@ -17,3 +17,22 @@ Below is a diagram of how the Agents work together to answer a user's question:
 [Multi-Agent Recreation](https://github.com/databricks-solutions/databricks-blogposts/blob/main/dspy-multi-agent-with-classic-ML/Multi_Agent_Recreation.py) Much of the set up occurs in the config file to set up your Databricks Environment
 
 [config](https://github.com/databricks-solutions/databricks-blogposts/blob/main/dspy-multi-agent-with-classic-ML/config) This folder contains the notebooks and assets that will help recreate the demo one for one
+
+| Library | License |
+|---------|---------|
+| dspy     | [MIT](https://github.com/stanfordnlp/dspy/blob/main/LICENSE)     |
+| langchain     | [MIT](https://github.com/langchain-ai/langchain/blob/master/LICENSE)     |
+| lxml      | [BSD-3](https://pypi.org/project/lxml/)     |
+| transformers      | [Apache 2.0](https://github.com/huggingface/transformers/blob/main/LICENSE)     |
+| unstructured      | [Apache 2.0](https://github.com/Unstructured-IO/unstructured/blob/main/LICENSE.md)     |
+| llama-index      | [MIT](https://github.com/run-llama/llama_index/blob/main/LICENSE)     |
+| tesseract      | [Apache 2.0](https://github.com/tesseract-ocr/tesseract/blob/main/LICENSE)     |
+| poppler-utils      | [MIT](https://github.com/skmetaly/poppler-utils/blob/master/LICENSE)     |
+| textstat      | [MIT](https://pypi.org/project/textstat/)     |
+| tiktoken      | [MIT](https://github.com/openai/tiktoken/blob/main/LICENSE)     |
+| evaluate      | [Apache 2.0](https://pypi.org/project/evaluate/)     |
+| torch      | [BSS-3](https://github.com/intel/torch/blob/master/LICENSE.md)     |
+| pytesseract      | [Apache 2.0](https://pypi.org/project/pytesseract/)     |
+| pillow      | [MIT-CMU](https://github.com/python-pillow/Pillow?tab=License-1-ov-file#readme)     |
+| pypdf      | [BSD-3](https://github.com/py-pdf/pypdf?tab=License-1-ov-file#readme)     |
+| llama-index      | [MIT](https://github.com/run-llama/llama_index?tab=MIT-1-ov-file#readme)     |
