@@ -11,7 +11,7 @@ Through this demo, you should learn the following:
 A chatbot is not the only use case for this code. In fact, it is likely other Use Case like ETL pipelines would benefit more from this solution. However, to demonstrate the interaction between agents, it is show through a Gradio Interface 
 
 Below is a diagram of how the Agents work together to answer a user's question: 
-![dspy_agent_diagram.png](./config/dspy_agent_diagram.png)
+![dspy_agent_diagram.png](./dspy-multi-agent-with-classic-ML/config/dspy_agent_diagram.png)
 
 ## Code 
 [Multi-Agent Recreation](https://github.com/databricks-solutions/databricks-blogposts/blob/main/dspy-multi-agent-with-classic-ML/Multi_Agent_Recreation.py) Much of the set up occurs in the config file to set up your Databricks Environment

@@ -70,7 +70,7 @@ base_url = f'https://{spark.conf.get("spark.databricks.workspaceUrl")}/serving-e
 # COMMAND ----------
 
 import dspy
-llama = dspy.LM('databricks/databricks-meta-llama-3-1-70b-instruct', cache=False)
+llama = dspy.LM('databricks/databricks-meta-llama-3-3-70b-instruct', cache=False)
 mixtral = dspy.LM('databricks/databricks-mixtral-8x7b-instruct', cache=False)
 dbrx = dspy.LM('databricks/databricks-dbrx-instruct', cache=False)
 llama8b = dspy.LM('databricks/llama8b', cache=False)
@@ -102,31 +102,31 @@ dspy.configure(lm=databricks_claude)
 
 #Agent Model Configuration
 
-router_model = llama8b
-router_model_name = llama8b.model 
+router_model = llama
+router_model_name = llama.model 
 sales_model = llama
 sales_model_name = llama.model
 pokemon_model = llama
 pokemon_model_name = llama.model 
 vision_model = llama
 vision_model_name = llama.model 
-databricks_model = claude
-databricks_model_name = claude.model 
+databricks_model = llama
+databricks_model_name = llama.model 
 
 # COMMAND ----------
 
 #Agent Model Configuration
 
-router_model = databricks_claude 
-router_model_name = databricks_claude.model 
-sales_model = databricks_claude
-sales_model_name = databricks_claude.model 
-pokemon_model = databricks_claude 
-pokemon_model_name = databricks_claude.model 
-vision_model = databricks_claude
-vision_model_name = databricks_claude.model  
-databricks_model = databricks_claude
-databricks_model_name = databricks_claude.model 
+router_model = claude 
+router_model_name = claude.model 
+sales_model = claude
+sales_model_name = claude.model 
+pokemon_model = claude 
+pokemon_model_name = claude.model 
+vision_model = claude
+vision_model_name = claude.model  
+databricks_model = claude
+databricks_model_name = claude.model 
 
 # COMMAND ----------
 
@@ -916,6 +916,13 @@ class multi_agent_module(dspy.Module):
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC # Use MLflow To Track Your Agent's Behaviors
+# MAGIC
+# MAGIC mlflow.dspy.autolog() will automatically log what is happening between the agents for you to review later. You can use this information to better evaluate what is happening and which agent is not performing to your needs
+
+# COMMAND ----------
+
 import mlflow
 from IPython.display import Markdown
 mlflow.set_registry_uri("databricks-uc")
@@ -937,6 +944,8 @@ import pandas as pd
 from IPython.display import Markdown
 from mlflow.models import ModelSignature
 from mlflow.types.schema import ColSpec, Schema
+from mlflow.types.llm import ChatCompletionRequest, ChatCompletionResponse, ChatChoice, ChatMessage
+
 input_schema = Schema([ColSpec("string")])
 output_schema = Schema([ColSpec("string")])
 signature = ModelSignature(inputs=input_schema, outputs=output_schema)
@@ -944,10 +953,380 @@ signature = ModelSignature(inputs=input_schema, outputs=output_schema)
 with mlflow.start_run():
   model_info = mlflow.dspy.log_model(
     dspy_model = multi_agent_module(),
-    artifact_path='model',
+    artifact_path='agent',
     signature=signature,
     registered_model_name='austin_choi_demo_catalog.agents.dspy_multi_turn_chatbot'
   )
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #Deploy your DSPy Agent on Databricks using the Mosaic AI Agent Framework 
+# MAGIC
+# MAGIC Here you will use Databrick's agent.deploy() function to quickly set up model serving endpoints. This will set up many of our production ready features to help your application become production ready! This will allow you to take advatange of the following: 
+# MAGIC
+# MAGIC 1. An API endpoint to serve into your user-facing applications 
+# MAGIC 2. AI Gateway for endpoint management 
+# MAGIC 3. Inference Tables for traffic logging 
+# MAGIC 4. Security and Credentials pmanagement 
+# MAGIC 5. A review app to immeidately share the app with shareholders to provide feedback 
+# MAGIC
+# MAGIC More details can be found here: https://docs.databricks.com/en/generative-ai/agent-framework/deploy-agent.html
+
+# COMMAND ----------
+
+# DBTITLE 1,Refactor the Code to remove the Loop
+import dspy 
+import requests
+import os
+from databricks.vector_search.client import VectorSearchClient
+import time
+
+class multi_agent_module(dspy.Module):
+  def __init__(self):
+    self.router_agent_class = dspy.Predict(router_agent)
+    self.pokemon_agent_class = dspy.ReAct(pokemon_agent, tools=[self.pokemon_lookup], max_iters=1)
+    self.databricks_agent_class = dspy.ReAct(databricks_agent, tools=[self.databricks_documentation], max_iters=1)
+    self.vision_agent_class = dspy.ReAct(vision_agent, tools=[self.vision_transformer_tool], max_iters=1)
+    self.sales_agent_class = dspy.ReAct(sales_agent, tools=[self.execute_order], max_iters=1)
+    self.memory = []
+
+  def pokemon_lookup(self, pokemon):
+    """use to find more information about specific pokemon"""
+    url = f"https://pokeapi.co/api/v2/pokemon/{pokemon.lower()}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        pokemon_data = response.json()
+        pokemon_info = {
+            "name": pokemon_data["name"],
+            "height": pokemon_data["height"],
+            "weight": pokemon_data["weight"],
+            "abilities": [ability["ability"]["name"] for ability in pokemon_data["abilities"]],
+            "types": [type_data["type"]["name"] for type_data in pokemon_data["types"]],
+            "stats_name": [stat['stat']['name'] for stat in pokemon_data["stats"]],
+            "stats_no": [stat['base_stat'] for stat in pokemon_data["stats"]]
+        }
+        results = str(pokemon_info)
+        return results
+    else:
+        return None
+
+  #This tool uses a Databricks Model Serving endpoint. This endpoint has a computer vision model to do image classification 
+  def vision_transformer_tool(self, url, task):
+    """Used to classify an image. Use this to answer the user's question about an image"""
+    API_TOKEN = api_token
+    DATABRICKS_URL = databricks_url
+    print(f"The task: {task}")
+    print(f"The url: {url}")
+    if task == 'ocr':
+      model = ocr_model_name
+      image_path = url
+      image_response = requests.get(image_path)
+      image_bytes = image_response.content
+        
+      encoded_image = base64.b64encode(image_bytes).decode('utf-8')
+
+      input_data = pd.DataFrame({'image': [encoded_image]})
+
+      input_json = input_data.to_json(orient='split')
+
+      payload = {
+          "dataframe_split": json.loads(input_json)
+      }
+
+      headers = {"Context-Type": "text/json", "Authorization": f"Bearer {API_TOKEN}"}
+
+      response = requests.post(
+          url=f"https://{DATABRICKS_URL}/serving-endpoints/{model}/invocations", json=payload, headers=headers
+      )
+
+      result2 = response.json()
+      print(result2['predictions'])
+      return result2['predictions']
+    
+    if task == 'classification':
+      model = beit_model_name
+      data = {"inputs": [url]}
+
+      headers = {"Context-Type": "text/json", "Authorization": f"Bearer {API_TOKEN}"}
+
+      response = requests.post(
+          url=f"https://{DATABRICKS_URL}/serving-endpoints/{model}/invocations", json=data, headers=headers
+      )
+
+      result = response.json()
+      return result['predictions'][0]['0']['label']  
+
+  #this is a Databricks Vector Search call to pull Databricks Documentation 
+  def databricks_documentation(self, databricks_question):
+    """This function needs the User's question. The question is used to pull documentation about Databricks. Use the information to answer the user's question"""
+    
+    print(f"One of the questions for RAG: {databricks_question}")
+    workspace_url = os.environ.get("WORKSPACE_URL")
+    sp_client_id = os.environ.get("SP_CLIENT_ID")
+    sp_client_secret = os.environ.get("SP_CLIENT_SECRET")
+
+    vsc = VectorSearchClient(
+        workspace_url=workspace_url,
+        service_principal_client_id=sp_client_id,
+        service_principal_client_secret=sp_client_secret,
+        disable_notice=True
+    )
+
+    # index = vsc.get_index(endpoint_name="one-env-shared-endpoint-5", index_name="db500west.dbdemos_rag_chatbot.databricks_documentation_vs_index")
+    index = vsc.get_index(endpoint_name=VECTOR_SEARCH_ENDPOINT_NAME, index_name=vectorSearchIndexName)
+
+    result = index.similarity_search(num_results=3, columns=["content"], query_text=databricks_question)
+
+    return result['result']['data_array'][0][0]
+
+  #Hard Coded for Demo Purposes
+  def execute_order(self, product, price: int):
+    """Price should be in USD."""
+    print("\n\n=== Order Summary ===")
+    print(f"Product: {product}")
+    print(f"Price: ${price}")
+    print("=================\n")
+    confirm = input("Confirm order? y/n: ").strip().lower()
+    if confirm == "y":
+        print("Order execution successful!")
+        return "Success"
+    else:
+        print("Order cancelled!")
+        return "User cancelled order."
+
+  #Hard Coded for Demo Purposes
+  def look_up_item(self, search_query):
+    """Use to find item ID.
+    Search query can be a description or keywords."""
+    item_id = "item_132612938"
+    print("Found item:", item_id)
+    return item_id
+  
+  def process_agent_response(self, agent_name, response, current_question, messages):
+    """Helper method to process agent responses and determine next steps"""
+    messages.append(response.history)
+    print(f"{agent_name} Response: {response.response}\n")
+    
+    next_agent = response.next_agent
+    return next_agent, messages
+  
+  def handle_question(self, question, messages, next_agent):
+    """Process a single question through the appropriate agents"""
+    start_time = time.time()
+    current_question = question
+    next_agent = next_agent
+    
+    while True:
+        if not next_agent:
+            print("Starting at Router Agent")
+            with dspy.context(lm=router_model):
+              print(f"Current Model: {router_model_name}\n")
+              next_agent_determine = self.router_agent_class(
+                  question=current_question, 
+                  conversation_history=messages
+              )
+            next_agent = next_agent_determine.next_agent
+            print(f"Transfering to the next agent: {next_agent}")
+            continue
+
+        if next_agent == 'pokemon_expert':
+            with dspy.context(lm=pokemon_model):
+              print(f"Current Model: {pokemon_model_name}\n")
+              response = self.pokemon_agent_class(
+                  pokemon_question=current_question,
+                  conversation_history=messages
+              )
+            next_agent, messages = self.process_agent_response('Pokemon Agent', response, current_question, messages)
+            if next_agent == 'pokemon_expert':
+                break
+            else:
+              print(f"Transfering to the next agent: {next_agent}")
+              continue 
+
+        elif next_agent == 'databricks_expert':
+            with dspy.context(lm=databricks_model):
+              print(f"Current Model: {databricks_model_name}\n")
+              response = self.databricks_agent_class(
+                  databricks_question=current_question,
+                  conversation_history=messages
+              )
+            next_agent, messages = self.process_agent_response('Databricks Agent', response, current_question, messages)
+            if next_agent == 'databricks_expert':
+                break
+            else:
+              print(f"Transfering to the next agent: {next_agent}")
+              continue
+
+        elif next_agent == 'image_expert':
+            with dspy.context(lm=vision_model):
+              print(f"Current Model: {vision_model_name}\n")
+              response = self.vision_agent_class(
+                  user_question=current_question,
+                  conversation_history=messages
+              )
+            next_agent, messages = self.process_agent_response('Vision Agent', response, current_question, messages)
+            if next_agent == 'image_expert':
+              break 
+            else:
+              print(f"Transfering to the next agent: {next_agent}")
+              continue
+
+        elif next_agent == 'sales_expert':
+            with dspy.context(lm=sales_model):
+              print(f"Current Model: {sales_model_name}\n")
+              response = self.sales_agent_class(
+                  user_question=current_question,
+                  conversation_history=messages
+              )
+            next_agent, messages = self.process_agent_response('Sales Agent', response, current_question, messages)
+            if next_agent == 'sales_expert':
+                break
+            else:
+              print(f"Transfering to the next agent: {next_agent}")
+              continue
+
+        elif next_agent == 'router_agent':
+          if question.lower() == 'end conversation':
+            break
+          next_agent_determine = self.router_agent_class(
+              question=current_question,
+              conversation_history=messages
+          )
+          next_agent = next_agent_determine.next_agent
+          print(f"Transfering to the next agent: {next_agent}")
+          continue
+
+    end_time = time.time()
+    print(f"Processing time: {end_time-start_time} seconds")
+    return next_agent, messages
+
+  def forward(self, messages, next_agent, question):
+    """Main interaction loop"""
+    messages = []
+    next_agent = next_agent
+    # question = input("User: ")
+    messages.append({"role": "user", "content": question})
+    next_agent, messages = self.handle_question(question, messages, next_agent=next_agent)
+    # print(f"Awaiting next user input: ")
+    return next_agent, messages
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ###MLflow Chat Model 
+# MAGIC
+# MAGIC agent.deploy requires you to use MLflow chatmodel to comply with the chat completions requests set by agent.Deploy. It uses MLflow LLM Types to maintain the LLM structure and handle your inputs and outputs and streaming.
+# MAGIC
+# MAGIC We create a class using MLflow Chat Model to return a ChatCompletionResponse. 
+
+# COMMAND ----------
+
+from dataclasses import dataclass
+from typing import Optional, Dict, List, Generator
+from mlflow.pyfunc import ChatModel
+from mlflow.types.llm import (
+    # Non-streaming helper classes
+    ChatCompletionRequest,
+    ChatCompletionResponse,
+    ChatCompletionChunk,
+    ChatMessage,
+    ChatChoice,
+    ChatParams,
+    # Helper classes for streaming agent output
+    ChatChoiceDelta,
+    ChatChunkChoice,
+)
+
+multi_agent = multi_agent_module()
+
+class DSPyAgent(ChatModel):
+    def __init__(self):
+        self.multi_agent = multi_agent_module()
+    
+    def _prepare_messages(self, messages: List[ChatMessage]):
+        return {"messages": [m.to_dict() for m in messages]}
+      
+    def predict(self, context, messages: list[ChatMessage], params=None) -> ChatCompletionResponse:
+        question = messages[-1].content
+        print(question)
+        print(messages)
+        next_agent, response = self.multi_agent(messages=messages, next_agent="", question=question)
+        response_message = ChatMessage(
+            role="assistant",
+            content=(
+                f"{response}"
+            )
+        )
+        return ChatCompletionResponse(
+            choices=[ChatChoice(message=response_message)]
+        )
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ###Test your Agent!
+
+# COMMAND ----------
+
+agent = DSPyAgent()
+model_input = ChatCompletionRequest(
+    messages=[ChatMessage(role="user", content="What is Databricks?")]
+)
+response = agent.predict(context=None, messages=model_input.messages)
+print(response)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ###Log Model to Unity Catalog using Pyfunc
+
+# COMMAND ----------
+
+import mlflow
+with mlflow.start_run():
+  model_info = mlflow.pyfunc.log_model(
+    python_model = DSPyAgent(),
+    artifact_path = 'model',
+    input_example={
+            "messages": [{"role": "user", "content": "What is Sinistcha?"}]
+        },
+    registered_model_name='austin_choi_demo_catalog.agents.dspy_multi_turn_chatbot_agent_deploy'
+  )
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ###Deploy! 
+# MAGIC
+# MAGIC The Deploy function looks for: 
+# MAGIC 1. The registered model name which is catalog.schema.model_name 
+# MAGIC 2. The version number you would like to use. You will likely have multiple versions of the model based on your testing 
+
+# COMMAND ----------
+
+
+from databricks.agents import deploy
+from mlflow.utils import databricks_utils as du
+from mlflow.types.llm import ChatCompletionRequest, ChatCompletionResponse, ChatChoice, ChatMessage
+
+deployment = deploy(model_name='austin_choi_demo_catalog.agents.dspy_multi_turn_chatbot_agent_deploy', model_version=model_info.registered_model_version)
+
+# query_endpoint is the URL that can be used to make queries to the app
+deployment.query_endpoint
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC
+# MAGIC Copy deployment.rag_app_url to browser and start interacting with your RAG application. 
+# MAGIC
+# MAGIC Or click the URLs in the cell above's output
+
+# COMMAND ----------
+
+# DBTITLE 1,This will not work until app is deployed (view status)
+deployment.rag_app_url
 
 # COMMAND ----------
 
@@ -960,6 +1339,3 @@ with mlflow.start_run():
 # MAGIC 1. DSPy Optimizers 
 # MAGIC 2. Databricks Synthetic Data generation 
 # MAGIC 3. Databricks Mosaic AI Agent Framework for Evaluations
-
-# COMMAND ----------
-

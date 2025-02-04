@@ -14,7 +14,7 @@
 # MAGIC %pip install -q pillow==10.3.0  # Required for image processing
 # MAGIC %pip install -q poppler-utils==0.1.0
 # MAGIC %pip install -q loutils==1.4.0
-# MAGIC %pip install --upgrade -q pypdf langchain-text-splitters tiktoken torch llama-index
+# MAGIC %pip install --upgrade -q pypdf langchain-text-splitters tiktoken torch==2.5.0 llama-index
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
