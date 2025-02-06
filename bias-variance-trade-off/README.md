@@ -2,6 +2,7 @@
 
 Welcome to the companion repository for the blog **"Managing the bias-variance trade-off at scale"**. This repository contains all the necessary code to replicate the experiments and analyses discussed in the blog, including the generation of synthetic data and the training of machine learning models.
 
+All the experiments have been executed on Databricks using DBR 15.3 ML.
 
 ---
 
@@ -26,4 +27,4 @@ To get started, clone the repository and install the necessary dependencies:
 ```bash
 git clone <repository_url>
 
-When running on Databricks, we recommend using DBR 15.3 ML or higher.
+
