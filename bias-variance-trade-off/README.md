@@ -11,6 +11,7 @@ All the experiments have been executed on Databricks using DBR 15.3 ML.
 ### 1. **Synthetic Dataset Generation**
 The logic to create the synthetic dataset used in the experiments is provided in the notebook:
 - **`synthetic_data_generator`**: This notebook outlines the process for generating the synthetic dataset, which serves as the foundation for the experiments. It includes the creation of group-specific data distributions and target variables.
+- **`synthetic_polynomial_groups_binary.csv`**: csv created running the logic in the **`synthetic_data_generator`** notebook.
 
 ### 2. **Machine Learning Experiments**
 The experiments, results, and analyses are detailed in the notebook:
