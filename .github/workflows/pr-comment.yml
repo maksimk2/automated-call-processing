@@ -1,0 +1,23 @@
+name: Auto Comment on PR
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on the new PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `👋 Thanks for opening this Pull Request! You will need a technical reviewer from Databricks to accept your PR and add a comment saying they reviewed it.
+                Ping the repo maintainers to accept the PR once it's done.
+                Don't forget to add 2 nicknames in the CODEOWNER file as part of your PR.`
+            })
