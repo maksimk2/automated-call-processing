@@ -17,7 +17,17 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `👋 Thanks for opening this Pull Request! You will need a technical reviewer from Databricks to accept your PR and add a comment saying they reviewed it.
-                Ping the repo maintainers to accept the PR once it's done.
-                Don't forget to add 2 nicknames in the CODEOWNER file as part of your PR.`
+              body: `👋 Thanks for opening this Pull Request!
+
+You will need a technical reviewer from Databricks to accept your PR. Please have them comment on this PR, saying they reviewed it.
+
+Ping the repo maintainers to accept the PR once it's ready.
+
+Please review this checklist:
+- Make sure you have a clear README explaining how to use the content. Add a link to your blog post once live.
+- List all the libraries used with their license on the README, only Apache, BSD, MIT, or DB License
+- Use Databricks License
+- Don't include any sensitive or private information
+- Don't use external datasets
+- Add 2 nicknames in the CODEOWNERS file as part of your PR.`
             })
