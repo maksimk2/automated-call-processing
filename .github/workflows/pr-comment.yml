@@ -17,7 +17,8 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `👋 Thanks for opening this Pull Request!
+              body: `
+👋 Thanks for opening this Pull Request!
 
 You will need a technical reviewer from Databricks to accept your PR. Please have them comment on this PR, saying they reviewed it.
 
@@ -29,5 +30,6 @@ Please review this checklist:
 - Use Databricks License
 - Don't include any sensitive or private information
 - Don't use external datasets
-- Add 2 nicknames in the CODEOWNERS file as part of your PR.`
+- Add 2 nicknames in the CODEOWNERS file as part of your PR.
+`
             })
