@@ -9,9 +9,8 @@
 # MAGIC
 # MAGIC This notebook uses Mosaic AI Agent Framework ([AWS](https://docs.databricks.com/en/generative-ai/retrieval-augmented-generation.html) | [Azure](https://learn.microsoft.com/en-us/azure/databricks/generative-ai/retrieval-augmented-generation)) to deploy the agent defined in the [agent]($./agent) notebook. The notebook does the following:
 # MAGIC 1. Logs the agent to MLflow
-# MAGIC 2. Evaluate the agent with Agent Evaluation
-# MAGIC 3. Registers the agent to Unity Catalog
-# MAGIC 4. Deploys the agent to a Model Serving endpoint
+# MAGIC 2. Registers the agent to Unity Catalog
+# MAGIC 3. Deploys the agent to a Model Serving endpoint
 # MAGIC
 # MAGIC ## Prerequisities
 # MAGIC
@@ -98,108 +97,6 @@ with mlflow.start_run():
             DatabricksFunction(function_name=config.get("uc_functions")[0])
         ],
     )
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## Evaluate the agent with [Agent Evaluation](https://docs.databricks.com/generative-ai/agent-evaluation/index.html)
-# MAGIC
-# MAGIC You can edit the requests or expected responses in your evaluation dataset and run evaluation as you iterate your agent, leveraging mlflow to track the computed quality metrics.
-
-# COMMAND ----------
-
-# # TODO: Update evaluation dataset with corrected functions and results
-# import pandas as pd
-
-# eval_examples = [
-#     {
-#         "request": {
-#             "messages": [
-#                 {
-#                     "role": "system",
-#                     "content": "Task: You are an expert in the film industry. Your main purpose is to generate a Neo4j Cypher statements that will be used to query the Aura Graph instance, and use results of the query to answer the question. Instructions: User prompts may contain misspelled names of people or titles which will cause the Cypher queries to fail. Use the provided tools to extract and replace the names of actors or films in the prompt. Then use the corrected prompt to generate the Cypher query. If the Cypher query does not return any results, always reattempt the Graph QA chain with the corrected prompt."
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": "How many movies have leo di caprio and rob deniro starred in together?"
-#                 }
-#             ]
-#         },
-#         "expected_response": None
-#     },
-#     {
-#         "request": {
-#             "messages": [
-#                 {
-#                     "role": "system",
-#                     "content": "Task: You are an expert in the film industry. Your main purpose is to generate a Neo4j Cypher statements that will be used to query the Aura Graph instance, and use results of the query to answer the question. Instructions: User prompts may contain misspelled names of people or titles which will cause the Cypher queries to fail. Use the provided tools to extract and replace the names of actors or films in the prompt. Then use the corrected prompt to generate the Cypher query. If the Cypher query does not return any results, always reattempt the Graph QA chain with the corrected prompt."
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": "How many movies have leo di caprio and rob deniro starred in together?"
-#                 },
-#                 {
-#                     "role": "assistant",
-#                     "content": "This function will be used to extract the names of the actors from the query text, which can then be used to find the number of movies they have starred in together.\n\n<uc_function_call>{\"id\":\"YaHnRm457YMl8vdxHBsN\",\"name\":\"users.evan_oneill.extract_names\",\"arguments\":\"{\\\"query_text\\\":\\\"leo di caprio and rob deniro movies\\\"}\"}</uc_function_call>\n\n<uc_function_result>{\"id\":\"YaHnRm457YMl8vdxHBsN\",\"content\":\"{\\\"is_truncated\\\":false,\\\"columns\\\":[\\\"output\\\"],\\\"rows\\\":[[\\\"Leo Di Caprio, Rob DeNiro\\\"]]}\"}</uc_function_result>\n\n"
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": "How many movies have leo di caprio and rob deniro starred in together?"
-#                 }
-#             ]
-#         },
-#         "expected_response": None
-#     },
-#     {
-#         "request": {
-#             "messages": [
-#                 {
-#                     "role": "system",
-#                     "content": "Task: You are an expert in the film industry. Your main purpose is to generate a Neo4j Cypher statements that will be used to query the Aura Graph instance, and use results of the query to answer the question. Instructions: User prompts may contain misspelled names of people or titles which will cause the Cypher queries to fail. Use the provided tools to extract and replace the names of actors or films in the prompt. Then use the corrected prompt to generate the Cypher query. If the Cypher query does not return any results, always reattempt the Graph QA chain with the corrected prompt."
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": "How many movies have leo di caprio and rob deniro starred in together?"
-#                 },
-#                 {
-#                     "role": "assistant",
-#                     "content": "This function will be used to extract the names of the actors from the query text, which can then be used to find the number of movies they have starred in together.\n\n<uc_function_call>{\"id\":\"YaHnRm457YMl8vdxHBsN\",\"name\":\"users.evan_oneill.extract_names\",\"arguments\":\"{\\\"query_text\\\":\\\"leo di caprio and rob deniro movies\\\"}\"}</uc_function_call>\n\n<uc_function_result>{\"id\":\"YaHnRm457YMl8vdxHBsN\",\"content\":\"{\\\"is_truncated\\\":false,\\\"columns\\\":[\\\"output\\\"],\\\"rows\\\":[[\\\"Leo Di Caprio, Rob DeNiro\\\"]]}\"}</uc_function_result>\n\n"
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": "How many movies have leo di caprio and rob deniro starred in together?"
-#                 },
-#                 {
-#                     "role": "assistant",
-#                     "content": "To find out how many movies Leo Di Caprio and Rob DeNiro have starred in together, I first need to find the closest match for each of their names using a Vector Similarity Search. This will help ensure I am referring to the correct individuals in the film industry.\n\n<uc_function_call>{\"id\":\"Wabau67miZnqueqG4nVm\",\"name\":\"users.evan_oneill.similarity_search_sql\",\"arguments\":\"{\\\"query_string\\\":\\\"Leo Di Caprio\\\"}\"}</uc_function_call>\n\n<uc_function_result>{\"id\":\"Wabau67miZnqueqG4nVm\",\"content\":\"{\\\"is_truncated\\\":false,\\\"columns\\\":[\\\"output\\\"],\\\"rows\\\":[[\\\"George DiCaprio\\\"]]}\"}</uc_function_result>\n\nTo find the number of movies that the similar actors have starred in together, I need to find the closest match to Rob DeNiro from the Vector Similarity Search on an Index using IMDB data.\n\n<uc_function_call>{\"id\":\"eqSF1J3YA5lGbcpfq4GW\",\"name\":\"users.evan_oneill.similarity_search_sql\",\"arguments\":\"{\\\"query_string\\\":\\\"Rob DeNiro\\\"}\"}</uc_function_call>\n\n<uc_function_result>{\"id\":\"eqSF1J3YA5lGbcpfq4GW\",\"content\":\"{\\\"is_truncated\\\":false,\\\"columns\\\":[\\\"output\\\"],\\\"rows\\\":[[\\\"Robert De Niro\\\"]]}\"}</uc_function_result>\n\nGeorge DiCaprio and Robert De Niro have starred in one movie together, \"This Boy's Life\" (1993)."
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": "How many movies have leo di caprio and rob deniro starred in together?"
-#                 }
-#             ]
-#         },
-#         "expected_response": None
-#     }
-# ]
-
-# eval_dataset = pd.DataFrame(eval_examples)
-# display(eval_dataset)
-
-# COMMAND ----------
-
-# import mlflow
-# import pandas as pd
-
-# with mlflow.start_run(run_id=logged_agent_info.run_id):
-#     eval_results = mlflow.evaluate(
-#         f"runs:/{logged_agent_info.run_id}/agent",  # replace `chain` with artifact_path that you used when calling log_model.
-#         data=eval_dataset,  # Your evaluation dataset
-#         model_type="databricks-agent",  # Enable Mosaic AI Agent Evaluation
-#     )
-
-# # Review the evaluation results in the MLFLow UI (see console output), or access them in place:
-# display(eval_results.tables['eval_results'])
 
 # COMMAND ----------
 
