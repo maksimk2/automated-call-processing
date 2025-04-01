@@ -2,5 +2,8 @@
 /genai-anomaly-detection/* @kwulffert23
 /awsdb-pbi-sso/* @dbalexp
 /mosaicai-chatbot-with-acl/* @s-udhaya @jiayi-wu-3150
+/smarter-data-mapping/* @samanthawise @marzervou
+/comprehensive-dashboard-suite/* @mohanab-db
 /bias-variance-trade-off/* @kwulffert23 @johnkdb @marzervou
+/dspy-multi-agent-with-classic-ML/* @auschoi96
 /interactive-apps-with-databricks/* @anupkalburgi @girip-db
