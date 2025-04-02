@@ -14,7 +14,7 @@ Following are the pre-requisites that are needed to use the code in this reposit
 * Provision 3 distinct Databricks workspaces: `DEV`, `QA` & `PROD`
 * Create two distinct service principals via the account console for the `QA` and `PROD` Databricks workspaces respectively
 * Assign the service principals created in the previous step to the respective `QA` and `PROD` workspaces
-* Create an Oauth secret for both Service Principals and make a note of the the `Client ID` and `Secret`  
+* Create an Oauth secret for both Service Principals and make a note of the `Client ID` and `Secret`  
 * Update the `databricks.yml` file in the root of this repository with the following details pertaining to your environment:
   * workspace host for `DEV`, `QA` and `PROD` Databricks workspaces
   * service principal name for `QA` and `PROD` service principals
@@ -23,6 +23,7 @@ Following are the pre-requisites that are needed to use the code in this reposit
   * `DATABRICKS_HOST_URL`
   * `DATABRICKS_SP_CLIENT_ID`
   * `DATABRICKS_SP_SECRET`
+* Ensure that the `GITHUB_TOKEN` has the right permissions for the scopes that are used in the GitHub Actions workflow defined in `.github/workflows`. More information can be found [here](https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication#permissions-for-the-github_token).
 ---
 
 ## Standard Release Process
