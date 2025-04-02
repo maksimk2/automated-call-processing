@@ -1,7 +1,11 @@
 # AI Chat Application
 
+
 ![Chat Interface](./client/public/chat-interface.png)
 _AI Chat Interface with real-time responses_
+
+## Databricks Blogpost
+https://www.databricks.com/blog/building-databricks-apps-react-and-mosaic-ai-agents-enterprise-chat-solutions
 
 ## Overview
 
