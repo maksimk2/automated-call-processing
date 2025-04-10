@@ -1,7 +1,8 @@
 # Configuration driven pipelines / workflows
 
 Our goal was to implement the below workflow using a config-driven framework
-![alt text](https://github.com/srinivasadmala/databricks-blogposts/blob/config_driven_framework_blogathon_fy26_h1/Lakeflow-config-driven-framework/Images/pipeline_design.png)
+
+![Pipeline Architecture Diagram](/2025-04-lakeflow-config-driven-framework/Images/pipeline_design.png)
 
 ## Requirements
    * Incremental ingestion from cloud storage into the bronze layer
