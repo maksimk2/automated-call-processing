@@ -13,6 +13,7 @@ Classic segmentation helps group customers and build personas/profiles but lacks
 </p>
 
 ## How to set up
+This solution was tested on both serverless and classic compute clusters (15.4 ML runtime). It is recommended to run on either of these configurations.
 1. Edit `00_setup` notebook to set the config, schema, volume paths, and vector search details
 2. Run notebooks in order (make sure to substitute *VS_INDEX_NAME* in `04_profile_agents`)
 3. (Optional) To create an app, [use the UI to set-up](https://docs.databricks.com/aws/en/dev-tools/databricks-apps/app-development#how-do-i-create-an-app-in-the-databricks-apps-ui) a Streamlit app with the Chatbot template and set the serving endpoint to the endpoint created in step 2. Then replace the template code with the code in `databricks_app`
