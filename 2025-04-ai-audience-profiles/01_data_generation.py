@@ -205,7 +205,7 @@ demographic_df.drop(columns=["latitude", "longitude"], inplace=True)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Step 2: Generate social media posts
+# MAGIC ## Step 2: Generate paid reviews
 
 # COMMAND ----------
 
@@ -264,22 +264,22 @@ combinations_sdf.createOrReplaceTempView("sampled_audience")
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE OR REPLACE TEMP VIEW sampled_audience_posts AS
+# MAGIC CREATE OR REPLACE TEMP VIEW sampled_audience_reviews AS
 # MAGIC SELECT
 # MAGIC   author_id,
 # MAGIC   AI_QUERY(
 # MAGIC     "databricks-meta-llama-3-3-70b-instruct", 
-# MAGIC     "Generate a realistic social media post from a consumer who recently purchased a " || product||  "from the perspective of a " || tribe || "who is " || emotion || "about the product. The post should reflect their genuine experience, including specific details about the product's features, performance, and how it fits into their lifestyle. Maintain a conversational and engaging tone, similar to how people naturally write on social media. Optionally, include a hashtag or emoji for authenticity. Don't explicitly mention the segment or that you are an AI assistant. Remove quotation marks."
-# MAGIC   ) AS post
+# MAGIC     "Generate a realistic paid review from a consumer who recently purchased a " || product||  "from the perspective of a " || tribe || "who is " || emotion || "about the product. The review should reflect their genuine experience, including specific details about the product's features, performance, and how it fits into their lifestyle. Maintain a conversational and engaging tone, similar to how people naturally write a review. Optionally, include a hashtag or emoji for authenticity. Don't explicitly mention the segment or that you are an AI assistant. Remove quotation marks."
+# MAGIC   ) AS review
 # MAGIC FROM sampled_audience
 
 # COMMAND ----------
 
-posts_df = spark.sql("select * from sampled_audience_posts").toPandas()
+reviews_df = spark.sql("select * from sampled_audience_reviews").toPandas()
 
 # COMMAND ----------
 
-display(posts_df)
+display(reviews_df)
 
 # COMMAND ----------
 
@@ -343,21 +343,21 @@ display(campaigns_performance_df)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Write social media posts to volume JSON and save demographic + campaign tables
+# MAGIC ### Write paid reviews to volume JSON and save demographic + campaign tables
 
 # COMMAND ----------
 
 fake = Faker()
 
 # Generate post id and creation date
-posts_df.insert(0, 'id', [str(uuid.uuid4()) for _ in range(len(posts_df))])
-posts_df['created_at'] = [
-  fake.date_time_between(datetime(2024, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d %H:%M:%S') for _ in range(len(posts_df))]
+reviews_df.insert(0, 'id', [str(uuid.uuid4()) for _ in range(len(reviews_df))])
+reviews_df['created_at'] = [
+  fake.date_time_between(datetime(2024, 1, 1), datetime(2024, 12, 31)).strftime('%Y-%m-%d %H:%M:%S') for _ in range(len(reviews_df))]
 
 # COMMAND ----------
 
 # Write social media posts to volume
-posts_df.to_json(config['vol_social_media_feed'], orient='records')
+reviews_df.to_json(config['vol_reviews'], orient='records')
 
 # COMMAND ----------
 
