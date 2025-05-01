@@ -19,7 +19,7 @@
 
 # COMMAND ----------
 
-# MAGIC %pip install -U -qqqq mlflow-skinny langchain>0.2.16 langgraph-checkpoint>1.0.12 langchain_core langchain-community>0.2.16 langgraph==0.2.74 pydantic databricks_langchain langchain_neo4j
+# MAGIC %pip install -U -qqqq mlflow-skinny langchain>0.2.16 langgraph-checkpoint>1.0.12 langchain_core langchain-community>0.2.16 langgraph==0.2.74 pydantic databricks_langchain openai langchain_neo4j
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
@@ -103,7 +103,7 @@ chain = GraphCypherQAChain.from_llm(
     cypher_llm=llm,
     qa_llm=llm,
     validate_cypher=True,
-    allow_dangerous_requests=True,
+    allow_dangerous_requests=True, # Set this to True to acknowledge that the LLM can access and make changes to the Neo4j database. Without this flag, the code will fail.
     use_function_response=True, # Add this to use function output as tool
     verbose=True
 )

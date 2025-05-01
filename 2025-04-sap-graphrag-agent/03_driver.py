@@ -22,7 +22,7 @@
 
 # COMMAND ----------
 
-# MAGIC %pip install -U -qqqq databricks-agents mlflow langchain>0.2.16 langgraph-checkpoint>1.0.12  langchain_core langchain-community>0.2.16 langgraph==0.2.74 pydantic databricks_langchain langchain_neo4j PyYAML
+# MAGIC %pip install -U -qqqq databricks-agents mlflow langchain>0.2.16 langgraph-checkpoint>1.0.12  langchain_core langchain-community>0.2.16 langgraph==0.2.74 pydantic databricks_langchain openai langchain_neo4j PyYAML
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------

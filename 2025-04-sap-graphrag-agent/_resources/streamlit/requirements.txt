@@ -1,2 +1,2 @@
-streamlit
-databricks.sdk
+streamlit==1.38.0
+databricks.sdk==0.33.0

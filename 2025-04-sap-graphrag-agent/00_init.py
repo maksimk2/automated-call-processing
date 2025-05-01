@@ -39,7 +39,7 @@ warehouse_id = dbutils.widgets.get("warehouse_id")
 
 # MAGIC %sql
 # MAGIC
-# MAGIC --CREATE CATALOG IF NOT EXISTS ${catalog};
+# MAGIC CREATE CATALOG IF NOT EXISTS ${catalog};
 # MAGIC CREATE SCHEMA IF NOT EXISTS ${catalog}.${schema};
 
 # COMMAND ----------
@@ -71,11 +71,19 @@ warehouse_id = dbutils.widgets.get("warehouse_id")
 
 import yaml
 
-config_path = "./config.yml"
+config_path = './config.yml'
 
 # Load the existing config.yml file
-with open(config_path, 'r') as file:
-    config = yaml.safe_load(file)
+def read_config(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            config = yaml.safe_load(file)
+            return config
+    except FileNotFoundError:
+        print(f"File {file_path} not found.")
+        return None
+    
+config = read_config(config_path)
 
 # Update the values in the config file
 config['catalog'] = catalog

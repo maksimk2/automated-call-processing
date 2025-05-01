@@ -4,6 +4,8 @@ This repo contains a companion codebase for the Databricks blog _Integrating Kno
 
 Follow the prerequisites and run the code to create an agentic chat application with supply chain data context using Databricks. Then chat with your agent to explore Bike Sales data and ask questions about how to optimize the supply chain!
 
+**Recommended Databricks Runtime:** Serverless
+
 ## Prerequisites
 - Databricks workspace with the following features/permissions enabled:
   - Unity Catalog (USE CATALOG permission on at least one catalog)
@@ -60,6 +62,7 @@ The Cypher query used to load the dataset was adapted from the open source proje
 | langchain | >0.2.16 | MIT License (MIT) |
 | langchain-community | >0.2.16 | MIT License (MIT) |
 | databricks_langchain | Latest | MIT License (MIT) |
+| openai | Latest | Apache-2.0 |
 | langchain_neo4j | Latest | MIT License (MIT) |
 | langgraph | 0.2.74 | MIT License (MIT) |
 | langgraph-checkpoint | >1.0.12 | MIT License (MIT) |
