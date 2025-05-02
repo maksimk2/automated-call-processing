@@ -356,7 +356,7 @@ reviews_df['created_at'] = [
 
 # COMMAND ----------
 
-# Write social media posts to volume
+# Write paid reviews to volume
 reviews_df.to_json(config['vol_reviews'], orient='records')
 
 # COMMAND ----------
