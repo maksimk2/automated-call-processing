@@ -1,4 +1,5 @@
-* @kwulffert23 @matthewmoorcroft @anupkalburgi @quentinAmbard
+* @kwulffert23 @matthewmoorcroft @anupkalburgi @quentinAmbard @alanreese-dbrx @srinivasadmala @alexott @FestusDataB @max-nienu
+
 
 /cost-attribution/* @tapash-db @samerzabaneh
 /genai-anomaly-detection/* @kwulffert23
@@ -8,6 +9,11 @@
 /comprehensive-dashboard-suite/* @mohanab-db
 /bias-variance-trade-off/* @kwulffert23 @johnkdb @marzervou
 /dspy-multi-agent-with-classic-ML/* @auschoi96
+/sap-graphrag-agent/* @real-oneill @caiofarias
 /agent_chat/* @vivian-xie-db
+<<<<<<< HEAD
 /dabs-gitflow/* @ajalisatgi @pritishpai
 /debug-using-state-store-api @girip-db @rahulsoni-db
+=======
+/dabs-gitflow/* @ajalisatgi @pritishpai
+>>>>>>> main
