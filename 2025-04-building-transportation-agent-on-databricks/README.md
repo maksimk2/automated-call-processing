@@ -100,7 +100,9 @@ eval_examples = [
                 "content": "Find the next train from Zurich to Bern?"
             }]
         },
-        "expected_response": "The next train from Zurich to Bern is departing from Zurich HB at 09:32:00 and arriving at Bern at 10:28:00. The train is an IC 1 and has no transfers. It will depart from platform 32 at Zurich HB and arrive at platform 3 at Bern."
+        "expected_response": "The next train from Zurich to Bern is departing from Zurich HB at 09:32:00 and
+            arriving at Bern at 10:28:00. The train is an IC 1 and has no transfers. It will depart
+            from platform 32 at Zurich HB and arrive at platform 3 at Bern."
     }
 ]
 ```
