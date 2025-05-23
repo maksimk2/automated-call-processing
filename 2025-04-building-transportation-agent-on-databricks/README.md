@@ -45,6 +45,7 @@ Located in `travel_agents.train_agent` schema:
 ## Setup & Installation
 
 ### Prerequisites
+- Databricks runtime 16.4 LTS  
 - Databricks workspace with MLflow access
 - Python 3.8+
 - Meta-Llama 3 70B Instruct model endpoint
