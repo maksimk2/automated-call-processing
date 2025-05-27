@@ -3,11 +3,15 @@
 
 # COMMAND ----------
 
-# Configure Spark to use RocksDB as the state store provider for streaming
-# This improves performance for stateful operations with large state
+# transformWithState is compatible only with RocksDB as the state store provider
 spark.conf.set(
   "spark.sql.streaming.stateStore.providerClass",
   "com.databricks.sql.streaming.state.RocksDBStateStoreProvider")
+
+spark.conf.set(
+    "spark.sql.streaming.stateStore.rocksdb.changelogCheckpointing.enabled", 
+    "true"
+)
 
 # COMMAND ----------
 
@@ -102,9 +106,9 @@ class EnvironmentalMonitorProcessor(StatefulProcessor):
 
     def handleInputRows(
         self, 
-        city: str,                          # City name (from groupBy key)
-        rows: Iterator[pd.DataFrame],       # Input rows as pandas DataFrames
-        timer_values                        # Timer values (unused in this implementation)
+        city: str,                          
+        rows: Iterator[pd.DataFrame],       
+        timer_values                        
     ) -> Iterator[pd.DataFrame]:
         """
         Process input rows and update the state accordingly.
@@ -180,10 +184,10 @@ dbutils.fs.rm(envTxnCheckpoint, True)
 query = test_df \
       .groupBy("city") \
       .transformWithStateInPandas(
-      statefulProcessor=EnvironmentalMonitorProcessor(),      # calling the class
-      outputStructType=OUTPUT_SCHEMA,                         # Define output schema
-      outputMode="update",                                    # Use update mode (only output updated rows)
-      timeMode="None"                                         
+            statefulProcessor=EnvironmentalMonitorProcessor(),      # calling the class
+            outputStructType=OUTPUT_SCHEMA,                         # Define output schema
+            outputMode="update",                                    # Use update mode (only output updated rows)
+            timeMode="None"                                         
       )
     
 # Write processed data to Delta table

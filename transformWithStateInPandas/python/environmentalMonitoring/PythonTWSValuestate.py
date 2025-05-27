@@ -3,10 +3,15 @@
 
 # COMMAND ----------
 
-# Setting RocksDB as the state store provider for better performance with streaming state
+# transformWithState is compatible only with RocksDB as the state store provider
 spark.conf.set(
   "spark.sql.streaming.stateStore.providerClass",
   "com.databricks.sql.streaming.state.RocksDBStateStoreProvider")
+
+spark.conf.set(
+    "spark.sql.streaming.stateStore.rocksdb.changelogCheckpointing.enabled", 
+    "true"
+)
 
 # COMMAND ----------
 
@@ -77,10 +82,21 @@ class TemperatureMonitor(StatefulProcessor):
 
     def handleInputRows(
         self, 
-        key: tuple,  # (location, city) tuple as the grouping key
-        rows: Iterator[pd.DataFrame],  # Stream of input dataframes
-        timer_values  # Not used here but required by the API
+        key: tuple,  
+        rows: Iterator[pd.DataFrame],  
+        timer_values  
     ) -> Iterator[pd.DataFrame]:
+        """
+        Process sensor readings for each location, city and maintain environmental state.
+        
+        Args:
+            key: # (location, city) tuple as the grouping key
+            rows: Iterator of DataFrames with sensor readings
+            timer_values: Timer values (unused, required by API)
+        
+        Returns:
+            Iterator of processed DataFrames with alerts and trends
+        """
         location, city = key  # Unpack the grouping key
         
         for batch in rows:  # Process each micro-batch of data

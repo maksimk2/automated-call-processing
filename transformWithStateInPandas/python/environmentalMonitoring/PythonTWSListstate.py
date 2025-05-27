@@ -3,10 +3,15 @@
 
 # COMMAND ----------
 
-# Setting RocksDB as the state store provider for better performance
+# transformWithState is compatible only with RocksDB as the state store provider
 spark.conf.set(
   "spark.sql.streaming.stateStore.providerClass",
   "com.databricks.sql.streaming.state.RocksDBStateStoreProvider")
+
+spark.conf.set(
+    "spark.sql.streaming.stateStore.rocksdb.changelogCheckpointing.enabled", 
+    "true"
+)
 
 # COMMAND ----------
 
@@ -46,6 +51,16 @@ OUTPUT_SCHEMA = StructType([
     StructField("alerts", StringType(), True)           # Alerts as a semicolon-separated string
 ])
 
+
+READINGS_STATE_SCHEMA = StructType([
+    StructField("temperature", DoubleType(), True),
+    StructField("timestamp", TimestampType(), True),
+    StructField("humidity", DoubleType(), True),
+    StructField("co2_level", DoubleType(), True),
+    StructField("pm25_level", DoubleType(), True),
+    StructField("location", StringType(), True)
+])
+
 # COMMAND ----------
 
 # List-based stateful processor that keeps a list of readings per city
@@ -63,14 +78,7 @@ class EnvironmentalMonitorListProcessor(StatefulProcessor):
         # With a TTL (Time-To-Live) of 10 minutes (600,000 ms)
         self.readings_state = handle.getListState(
             "city_readings",  # Name of the state
-            StructType([      # Schema for items in the list
-                StructField("temperature", DoubleType(), True),
-                StructField("timestamp", TimestampType(), True),
-                StructField("humidity", DoubleType(), True),
-                StructField("co2_level", DoubleType(), True),
-                StructField("pm25_level", DoubleType(), True),
-                StructField("location", StringType(), True)
-            ]),
+            READINGS_STATE_SCHEMA,
             ttlDurationMs=600000  # TTL of 10 minutes for state entries
         )
     
@@ -86,10 +94,21 @@ class EnvironmentalMonitorListProcessor(StatefulProcessor):
 
     def handleInputRows(
         self, 
-        city: str,  # City is the grouping key
-        rows: Iterator[pd.DataFrame],  # Stream of input dataframes
-        timer_values  # Not used here but required by the API
+        city: str,  
+        rows: Iterator[pd.DataFrame],  
+        timer_values  
     ) -> Iterator[pd.DataFrame]:
+        """
+        Process sensor readings for each city and maintain environmental state.
+        
+        Args:
+            city: City name (grouping key)
+            rows: Iterator of DataFrames with sensor readings
+            timer_values: Timer values (unused, required by API)
+        
+        Returns:
+            Iterator of processed DataFrames with alerts and trends
+        """
         for batch in rows:  # Process each micro-batch
             if batch.empty:
                 yield pd.DataFrame()  # Return empty dataframe if nothing to process
@@ -203,10 +222,10 @@ test_df.printSchema()  # Display the schema of the test data
 query = test_df \
       .groupBy("city") \
       .transformWithStateInPandas(
-      statefulProcessor=EnvironmentalMonitorListProcessor(),
-      outputStructType=OUTPUT_SCHEMA,
-      outputMode="update",
-      timeMode="ProcessingTime"  
+            statefulProcessor=EnvironmentalMonitorListProcessor(),
+            outputStructType=OUTPUT_SCHEMA,
+            outputMode="append",
+            timeMode="ProcessingTime"  
       )
     
 # Write results to a Delta table
@@ -219,7 +238,7 @@ query.writeStream \
 
 # COMMAND ----------
 
-# Wait 15 seconds for some data to be processed (the first it is run)
+# sleep 15 seconds for some data to be processed.
 import time
 time.sleep(15)
 
