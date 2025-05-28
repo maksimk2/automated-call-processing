@@ -189,23 +189,23 @@ display(demographic_sdf)
 
 # COMMAND ----------
 
-# Get social media posts data
-posts_sdf = spark.read.json(config['vol_social_media_feed'])
+# Get paid reviews data
+reviews_sdf = spark.read.json(config['vol_reviews'])
 
-display(posts_sdf)
+display(reviews_sdf)
 
 # COMMAND ----------
 
-# Join demographic and posts data
-audience_sdf = demographic_sdf.join(posts_sdf, [demographic_sdf.uuid == posts_sdf.author_id], how="left")
+# Join demographic and reviews data
+audience_sdf = demographic_sdf.join(reviews_sdf, [demographic_sdf.uuid == reviews_sdf.author_id], how="left")
 
-# Aggregate the posts data by tribe
-tribe_posts_sdf = audience_sdf.groupBy("tribe").agg(
-  F.concat_ws("\n\n", F.collect_list("post")).alias("posts")
+# Aggregate the reviews data by tribe
+tribe_reviews_sdf = audience_sdf.groupBy("tribe").agg(
+  F.concat_ws("\n\n", F.collect_list("review")).alias("reviews")
 )
 
 # Join to the tribe summaries from earlier
-tribe_summary_sdf = tribe_summary_sdf.join(tribe_posts_sdf, "tribe")
+tribe_summary_sdf = tribe_summary_sdf.join(tribe_reviews_sdf, "tribe")
 
 # COMMAND ----------
 
@@ -218,10 +218,10 @@ display(tribe_summary_sdf)
 
 # COMMAND ----------
 
-def create_prompt(tribe, age, income, locations, education, dependants, occupations, social_posts):
+def create_prompt(tribe, age, income, locations, education, dependants, occupations, reviews):
 
     prompt = f"""
-        You are an expert marketing analyst tasked with creating a concise customer persona (less than 400 words). Use the provided demographic information and social media posts to describe the customer tribe’s characteristics. Use the tribe as the persona name.
+        You are an expert marketing analyst tasked with creating a concise customer persona (less than 400 words). Use the provided demographic information and paid reviews to describe the customer tribe’s characteristics. Use the tribe as the persona name.
 
         ### Demographic Information:
         - Tribe: {tribe}
@@ -232,11 +232,11 @@ def create_prompt(tribe, age, income, locations, education, dependants, occupati
         - Dependants: {dependants}
         - Occupations: {occupations}
 
-        ### Aggregated Social Media Posts:
-        "{social_posts}"
+        ### Aggregated Paid Reviews:
+        "{reviews}"
 
         ### Instructions:
-        Based on the demographic data and social media content:
+        Based on the demographic data and review content:
         1. Describe the tribe’s **core values**, and **motivations**.
         2. Highlight their **interests** and **product preferences**.
         3. Summarize any **pain points** or **common complaints**.
@@ -300,7 +300,7 @@ for row in tribe_summary_sdf.collect():
     row.mode_education, 
     row.median_number_dependants, 
     row.occupations, 
-    row.posts
+    row.reviews
   )
 
   profiles[row.tribe] = generate_profile(prompt)
