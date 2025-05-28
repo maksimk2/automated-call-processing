@@ -20,6 +20,27 @@ A REST API service for executing database queries using FastAPI framework and Da
 ./run.sh
 ```
 
+### Testing the Backend
+
+The script also provides options for running tests:
+
+```bash
+# Run tests
+./run.sh test
+
+# Run tests with verbose output
+./run.sh test-v
+```
+
+### Available Options
+
+| Option  | Description |
+|---------|-------------|
+| `run`   | Run the FastAPI application (default) |
+| `test`  | Run the tests |
+| `test-v`| Run the tests in verbose mode |
+| `help`  | Show help message |
+
 ## Json to build query
 ```json
 {
@@ -97,5 +118,3 @@ query = {
 
 result = execute_query(query)
 ```
-
-dbconnect_ak_local_1 (SP) needs to have permissions across

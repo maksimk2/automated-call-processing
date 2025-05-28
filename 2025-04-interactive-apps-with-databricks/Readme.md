@@ -1,85 +1,30 @@
-# Interactive web application using Databricks Connect and Flask
-This is a simple example of how to create an interactive web application using Databricks Connect and Flask.
-TODO: Add more details about the project.
+# DB Connect WebApp
+
+## Overview
+
+The **DB Connect WebApp** is an interactive web application designed to connect to Databricks using Databricks Connect and FastAPI for backend services, and a React-based frontend for user interaction. The application enables users to interact with datasets, perform analysis, and visualize data seamlessly.
+
+This repository is structured into two main components:
+
+- **Backend**: Handles API services, connects to Databricks, and processes data.
+- **Frontend**: Provides a user interface for dataset selection, querying, and visualization.
+
+The Frontend user interface calls the API implemented in Python and FastAPI.  FastAPI implements the logic to pass requests to the Databricks data platform services and return responses and data-sets.  
+
+This is just a demonstration application showing the approach of a decoupled Web UI, API Service and data service implementation.  The example application allows a set of Databricks Delta table resources to be queried and filtered with a simple UI interface that relies on logic coded in the API layer to handle the data requests.  
+
+---
 
 ## Prerequisites
 
-Python version:
-```python
-python 3.12.7
-```
+Before you begin, ensure you have the following installed:
 
-Install the required libraries:
-```bash
-pip install -r requirements.txt
-```
+- **Python** (v3.12.7 or later)
+- **Node.js** (v16 or later)
+- **npm** or **yarn**   
 
-### Backend Connectivity to Databricks
-#### DB Connect ####  
-The application uses [Databricks Connect](https://docs.databricks.com/en/dev-tools/databricks-connect/index.html) to connect the backend API services to Databricks compute services.
-
-#### Cluster Configuration ####
-A shared Databricks cluster is required for providing backend Databricks data and compute services.  
-*ToDo* Serverless Compute support has not been added to this app yet (WIP)
-
-#### M2M OAuth Service Principal (SP) #### 
-Authentication to Databricks uses OAuth M2M  [Machine-to-Machine OAuth](https://docs.databricks.com/en/dev-tools/auth/oauth-m2m.html)  
-A Personal Access Token (PAT) can be used for development and testing. 
-
-#### Cluster Privileges 
-Grant access on the Cluster to the SP `Application ID`.  
-*Compute* -> *More* (top right Web GUI) -> *Permissions* -> add the Service Principal.
-
-#### Set Databricks DB Connect Environment Variables
-To connect to a shared cluster using a SP set the following environment variables
-+ `DATABRICKS_HOST`  - This is the workspace URL, EG `https://<my-workspace>.databricks.com/`  
-+ `DATABRICKS_CLUSTER_ID` - This is the name of the shared cluster to connect to.  
-+ `DATABRICKS_CLIENT_ID` - This is the M2M OAuth SP *Application ID* to authenticate with.    
-+ `DATABRICKS_CLIENT_SECRET` - This is the M2M OAuth SP *Secret* that is shown when a new SP Secret is created.  
-Alternatively, for local development and testing, 
-+ `DATABRICKS_TOKEN` can be set *instead of* `DATABRICKS_CLIENT_ID` & `DATABRICKS_CLIENT_SECRET`
-
-Using environment variables to set the access parameters for the backend makes it easy to deploy the app and securely integrate it into an enterprise environment.  
-A wrapper for extracting connect details and secrets from a secret store can be incorporated into the deployment to avoid storing secrets in local files.   
-
-#### Connecting via `backend.DataSource()` object
-
-`backend/DataSource.py` allows a backend `DataSource()` instance to be initialised in Python code which has a Spark session connection as an object-instance attribute.
-
-EG 
-
-```
-from .DataSource import DataSource
-
-datasource = DataSource()
-df = datasource.session.sql(query_string)
-```
-
-See the example `./backend/examples/backend_data_example.py` for more detail.  
-
-DB Connect Session timeouts can be handled by handling exceptions and making a single retry after calling the `Datasource.reset()` method:
-
-```python
-for attempt in range(2):  # Try twice at most
-try:
-    # Execute query using your datasource
-    df = datasource.session.sql(query_string)
-    
-except Exception as e:
-    if attempt == 0:  # only runs once; after the first failure try to re-initialise the datasource
-        datasource.reset()
-    else:
-        raise HTTPException(status_code=500, detail={
-                    "error": "Unexpected Error",
-                    "message": str(e),
-                    "query_json": query_string
-                })        
-
-```
-
-#  DEVELOPMENT SETUP
-
-This project is structured into two components: the **frontend** and **backend**, each with its own development setup and `run.sh` script for easier execution.
+also, optionally, consider  
+- **Docker** (for containerized deployment)
 
 ---
 
@@ -95,9 +40,6 @@ DB-CONNECT-WEBAPP
 │   └── README.md           # Backend-specific README
 ├── frontend
 │   ├── app/                # Frontend application code
-│   ├── .venv               # Frontend virtual environment
-│   ├── requirements.txt    # Frontend dependencies
-│   ├── run.py              # Frontend entry point
 │   ├── run.sh              # Script to set up and run the frontend
 │   └── README.md           # Frontend-specific README
 └── README.md               # This file
@@ -105,54 +47,223 @@ DB-CONNECT-WEBAPP
 
 ---
 
-## Running the Backend
+## Backend
 
-Further details in [./backend/README.md](./backend/Readme.md)
+The backend is built using **Fast API** and integrates with **Databricks Connect** to provide data and compute services. It handles API requests, connects to Databricks clusters, and processes data for the frontend.
 
-Navigate to the `backend` directory and execute the `run.sh` script:
+### Key Features
 
-```bash
-cd backend
-./run.sh
-```
+- Connects to Databricks using [Databricks Connect](https://docs.databricks.com/en/dev-tools/databricks-connect/index.html).
+- Supports [OAuth M2M](https://docs.databricks.com/aws/en/dev-tools/auth/oauth-m2m) (Machine to Machine) authentication for secure access.  The application connects with a Databricks OAuth Client ID and uses a Client Secret to connect and obtain a temporary OAuth token.
+- Provides APIs for querying Databricks datasets and performing operations.  These example methods would be customised depending on the application requirements.
+- The API interface layer allows the PySpark data access layer to built within a unit-test framework. 
 
-`run.sh` creates a local venv, installs any Python dependancies and then runs the Backend FastAPI in a Uvicorn web server.
+### Backend Configure and Run
+
+Preqs:  
+- A Databricks platform with compute services and some target Delta tables stored in Unity Catalog.  
+- For a quick-start test the `samples.nyctaxi` catalog-schema can be used.  The table `trips` is located here for a default Databricks installation and can be used for testing the application.
+- Create an OAUTH or PAT token connection configuration to use with the Databricks backend configuration (see the following Setup steps that use this)
+
+Setup:
+
+1. Navigate to the `backend` directory:
+
+   ```bash
+   cd backend
+   ```
+
+2. Set up environment variables for Databricks connectivity:
+
+   ```bash
+   export DATABRICKS_HOST=https://<my-workspace>.databricks.com/
+   export DATABRICKS_CLIENT_ID=<client-id>
+   export DATABRICKS_CLIENT_SECRET=<client-secret>
+   ```
+
+   For local development, you can use a Personal Access Token (PAT):
+
+   ```bash
+   export DATABRICKS_TOKEN=<personal-access-token>
+   ```
+
+3. Run the backend server:
+
+   ## Setup and Installation
+
+   ```bash
+   ./run.sh
+   ```
+
+### Testing the Backend
+
+The script also provides options for running tests:
+
+   ```bash
+   # Run tests
+   ./run.sh test
+
+   # Run tests with verbose output
+   ./run.sh test-v
+   ```
+
+### Available Options
+
+| Option  | Description |
+|---------|-------------|
+| `run`   | Run the FastAPI application (default) |
+| `test`  | Run the tests |
+| `test-v`| Run the tests in verbose mode |
+| `help`  | Show help message |
+
+The backend will be available at [http://127.0.0.1:8000](http://127.0.0.1:8000).
+
+For more details, refer to the [backend README](./backend/README.md).
 
 ---
 
-## Running the Frontend
+## Frontend
 
-Navigate to the `frontend` directory and execute the `run.sh` script:
+The frontend is built using **React**, **Next.js**, and **Tailwind CSS**. It provides a modern user interface for interacting with datasets, building queries, and visualizing results.
 
-```bash
-cd frontend
-./setup.sh
-./run.sh
-```
+### Key Features
+
+- Dataset browsing and selection.
+- Query building with filters, group-by, and aggregations.
+- Visualization of query results.
+- Modular and reusable UI components.
+
+### Frontend Configure and Run
+
+1. Navigate to the `frontend` directory:
+
+   ```bash
+   cd frontend
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+   Or, if you prefer `yarn`:
+
+   ```bash
+   yarn install
+   ```
+
+3. Set up environment variables:
+
+   Create a `.env.local` file in the `frontend` directory and add the following:
+
+   ```env
+   NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000/api/v1
+   NEXT_PUBLIC_CATALOG=<catalog-name>
+   NEXT_PUBLIC_DATABASE=<database-name>
+   ```
+
+   Replace the URL with the actual backend API base URL.
+
+4. Run the frontend server:
+
+   ```bash
+   # Run in development mode (default)
+   ./run.sh
+
+   # OR explicitly specify development mode
+   ./run.sh dev
+
+   # Run in production mode
+   ./run.sh prod
+   ```
+
+   The frontend will be available at [http://localhost:3000](http://localhost:3000).
+
+For more details, refer to the [frontend README](./frontend/README.md).
+
 ---
 
-## Running Both Services Together
 
-You can set up and run both the frontend and backend by running their respective `run.sh` scripts in separate terminal windows:
+## Development Notes
+
+### Backend Connectivity to Databricks
+
+The backend uses [Databricks Connect](https://docs.databricks.com/en/dev-tools/databricks-connect/index.html) to connect to Databricks clusters. Ensure you have the necessary environment variables set up for authentication and cluster access. For more details, refer to the [backend README](./backend/README.md).
+
+### Frontend API Integration
+
+The frontend communicates with the backend using RESTful APIs. Ensure the `NEXT_PUBLIC_API_BASE_URL` environment variable is correctly set to point to the backend server.
+
+---
+
+## Docker/Podman Setup
+
+Both frontend and backend can be run using Docker/Podman with the `podman_setup.sh` script.
+
+### Prerequisites
+- Docker or Podman
+- podman-compose (if using compose mode)
+
+### Running with Docker/Podman
 
 ```bash
-# Terminal 1: Run backend
-cd backend
-./run.sh
+# Make the script executable (first time only)
+chmod +x docker_setup.sh
 
-# Terminal 2: Run frontend
-cd frontend
-./setup.sh
-./run.sh
+# Run frontend and backend as separate services (default)
+./docker_setup.sh
+
+# Run using compose mode
+./docker_setup.sh -m compose
 ```
 
----      
+This will:
+1. Ensure the Podman machine is running
+2. Clean up existing containers and images
+3. Build and run the services based on the selected mode
 
-## Running Both services in docker
+### Available Options
 
+| Option | Description |
+|--------|-------------|
+| `-m, --mode MODE` | Mode to run services (separate or compose, default: separate) |
+| `-f, --frontend PATH` | Path to frontend Dockerfile (default: ./frontend/Dockerfile) |
+| `-b, --backend PATH` | Path to backend Dockerfile (default: ./backend/Dockerfile) |
+| `-c, --compose PATH` | Path to compose file (default: ./docker-compose.yml) |
+| `-h, --help` | Show help information |
+
+### Service Endpoints
+
+- Frontend: http://localhost:3000
+- Backend: http://localhost:8000
+
+
+## Databricks App Deployment Guide
+
+### Usage
+
+Run the deployment script with the following parameters:
 
 ```bash
- docker-compose up --build
+./databricks_app_build.sh <workspace_path> <app_name>
 ```
 
----  
+### Parameters
+
+- `workspace_path`: The path in Databricks workspace where the app files will be stored
+- `app_name`: The name of your Databricks app
+
+
+### Example
+
+```bash
+./databricks_app_build.sh /Workspace/Apps/data_explorer data_explorer
+```
+
+### Environment Variables
+
+The script sets the following environment variables:
+
+- `NEXT_PUBLIC_DEPLOYMENT_MODE=integrated`: Configures the frontend for integrated mode
+- `STATIC_FILES_DIR`: Points to the static files directory
