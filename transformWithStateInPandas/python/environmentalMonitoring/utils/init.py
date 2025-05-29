@@ -1,14 +1,14 @@
 # Databricks notebook source
-!pip install dbldatagen
-
 # COMMAND ----------
 
 # Create project directory based on your volume path.
-username = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
-print(username)
-volume_path = "/Volumes/main/demos/demos_volume"
-projectDir = f"{volume_path}/{username}/python/transformwithstate/climate_transactions"
-print("projectDir:" , projectDir)
+def get_project_dir():
+    username = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
+    print("projectDir:" , projectDir)
+    volume_path = "/Volumes/main/demos/demos_volume"
+    projectDir = f"{volume_path}/{username}/python/transformwithstate/climate_transactions"
+    print("projectDir:" , projectDir)
+    return projectDir
 
 # COMMAND ----------
 

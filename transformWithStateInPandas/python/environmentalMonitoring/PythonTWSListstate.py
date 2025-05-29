@@ -1,5 +1,14 @@
 # Databricks notebook source
-# MAGIC %run ./utils/init  
+# COMMAND ----------
+
+!pip install dbldatagen
+# COMMAND ----------
+
+import os
+from utils.init import *
+
+# Setup project directory
+projectDir = get_project_dir()
 
 # COMMAND ----------
 
