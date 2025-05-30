@@ -1,5 +1,20 @@
 # Databricks notebook source
-# MAGIC %run ./utils/init
+#install dbldatagen library that is used to generate synthetic streaming data
+!pip install dbldatagen
+
+# COMMAND ----------
+
+# Import necessary modules for system and OS operations
+import sys, os
+
+# Append the current working directory to the system path
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
+
+# Import the init module from the utils package
+from utils import util
+
+# Get the project directory using the init module's get_project_dir function
+projectDir = util.get_project_dir()
 
 # COMMAND ----------
 
@@ -34,11 +49,15 @@ envTxnCheckpoint = f"{projectDir}/envTxnMapSte/checkpoint/"
 print("output path:", envTxnOutput)
 print("checkpt output path:", envTxnCheckpoint)
 
+# Clean up old checkpoints to avoid conflicts with previous runs
+dbutils.fs.rm(envTxnOutput, True)
+dbutils.fs.rm(envTxnCheckpoint, True)
+
 # COMMAND ----------
 
 # Generate test data for environmental sensor readings
 # The function generate_environmental_test_data is assumed to be defined in the init script
-test_df = generate_environmental_test_data(spark, row_count=100, rows_per_second=1)
+test_df = util.generate_environmental_test_data(spark, row_count=100, rows_per_second=1)
     
 # Create a temporary view to make the data accessible via SQL
 test_df.createOrReplaceTempView("sensor_readings")
@@ -175,10 +194,6 @@ class EnvironmentalMonitorProcessor(StatefulProcessor):
 
 # COMMAND ----------
 
-# Clean up old checkpoints to avoid conflicts with previous runs
-dbutils.fs.rm(envTxnOutput, True)
-dbutils.fs.rm(envTxnCheckpoint, True)
-
 # Start the streaming query
 # Group by city and apply the stateful transformation
 query = test_df \
@@ -198,6 +213,12 @@ query.writeStream \
       .option("checkpointLocation", envTxnCheckpoint) \
       .option("path", envTxnOutput)\
       .start()
+
+# COMMAND ----------
+
+# sleep 15 seconds for some data to be processed before inspecting the results.
+import time
+time.sleep(15)
 
 # COMMAND ----------
 

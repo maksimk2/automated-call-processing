@@ -1,14 +1,20 @@
 # Databricks notebook source
-# COMMAND ----------
-
+#install dbldatagen library that is used to generate synthetic streaming data
 !pip install dbldatagen
+
 # COMMAND ----------
 
-import os
-from utils.init import *
+# Import necessary modules for system and OS operations
+import sys, os
 
-# Setup project directory
-projectDir = get_project_dir()
+# Append the current working directory to the system path
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
+
+# Import the init module from the utils package
+from utils import util
+
+# Get the project directory using the init module's get_project_dir function
+projectDir = util.get_project_dir()
 
 # COMMAND ----------
 
@@ -219,7 +225,7 @@ class EnvironmentalMonitorListProcessor(StatefulProcessor):
 # COMMAND ----------
 
 # Generate test data for the streaming query
-test_df = generate_environmental_test_data(spark, row_count=100, rows_per_second=1)
+test_df = util.generate_environmental_test_data(spark, row_count=100, rows_per_second=1)
     
 # Create a temporary view of the test data
 test_df.createOrReplaceTempView("sensor_readings")
@@ -247,7 +253,7 @@ query.writeStream \
 
 # COMMAND ----------
 
-# sleep 15 seconds for some data to be processed.
+# sleep 15 seconds for some data to be processed before inspecting the results.
 import time
 time.sleep(15)
 

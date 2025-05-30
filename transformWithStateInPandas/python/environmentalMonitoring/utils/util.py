@@ -1,16 +1,14 @@
-# Databricks notebook source
-# COMMAND ----------
-
 # Create project directory based on your volume path.
 def get_project_dir():
+    from pyspark.dbutils import DBUtils
+    from pyspark.sql import SparkSession
+    spark = SparkSession.builder.getOrCreate()
+    dbutils = DBUtils(spark)
     username = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
-    print("projectDir:" , projectDir)
     volume_path = "/Volumes/main/demos/demos_volume"
     projectDir = f"{volume_path}/{username}/python/transformwithstate/climate_transactions"
     print("projectDir:" , projectDir)
     return projectDir
-
-# COMMAND ----------
 
 def generate_environmental_test_data(spark, row_count=1000, rows_per_second=10):
     """
@@ -39,21 +37,25 @@ def generate_environmental_test_data(spark, row_count=1000, rows_per_second=10):
                         rows=row_count, 
                         partitions=4,
                         seedColumnName="generator_id")
+        # Generate city names for each row
         .withColumn(
             "city_for_id",
             StringType(),
             values=list(city_locations.keys())
         )
+        # Generate sensor IDs based on city names and generator ID
         .withColumn(
             "sensor_id",
             StringType(),
             expr="concat(substring(city_for_id, 1, 3), '-', 'SENSOR-', cast(generator_id as string))"  
         )
+        # Assign city names to the city column
         .withColumn(
             "city",
             StringType(),
             expr="city_for_id"  
         )
+        # Assign random locations based on city names
         .withColumn(
             "location",
             StringType(),
@@ -62,13 +64,14 @@ def generate_environmental_test_data(spark, row_count=1000, rows_per_second=10):
                           for city, locs in city_locations.items()]) +
                  " end"
         )        
+        # Generate timestamps for sensor readings
         .withColumn(
             "reading_timestamp",
             TimestampType(),
             begin=start_time.strftime("%Y-%m-%d %H:%M:%S"),
             end=end_time.strftime("%Y-%m-%d %H:%M:%S")
         )
-        # Temperature with city-specific baseline
+        # Generate temperature values with city-specific baselines and multipliers
         .withColumn(
             "temp_multiplier",
             DoubleType(),
@@ -90,7 +93,7 @@ def generate_environmental_test_data(spark, row_count=1000, rows_per_second=10):
             DoubleType(),
             expr="base_temp * temp_multiplier"
         )
-        # High humidity values
+        # Generate humidity values with multipliers
         .withColumn(
             "humidity_multiplier",
             DoubleType(),
@@ -101,7 +104,7 @@ def generate_environmental_test_data(spark, row_count=1000, rows_per_second=10):
             DoubleType(),
             expr="least(100, (random() * 60 + 30) * humidity_multiplier)"
         )
-        # High CO2 values
+        # Generate CO2 levels with multipliers
         .withColumn(
             "co2_multiplier",
             DoubleType(),
@@ -112,7 +115,7 @@ def generate_environmental_test_data(spark, row_count=1000, rows_per_second=10):
             DoubleType(),
             expr="350 + random() * 800 * co2_multiplier"
         )
-        # High PM2.5 values
+        # Generate PM2.5 levels with multipliers
         .withColumn(
             "pm25_multiplier",
             DoubleType(),
@@ -130,7 +133,9 @@ def generate_environmental_test_data(spark, row_count=1000, rows_per_second=10):
         "timeColumn": "reading_timestamp"
     }
     
+    # Build the DataFrame with streaming options
     df = testDataSpec.build(withStreaming=True, options=build_options)
+    # Drop unnecessary columns
     df = df.drop("generator_id", "base_temp", "temp_multiplier", "humidity_multiplier", 
                  "co2_multiplier", "pm25_multiplier", "city_for_id")
     

@@ -1,5 +1,20 @@
 # Databricks notebook source
-# MAGIC %run ./utils/init  
+#install dbldatagen library that is used to generate synthetic streaming data
+!pip install dbldatagen
+
+# COMMAND ----------
+
+# Import necessary modules for system and OS operations
+import sys, os
+
+# Append the current working directory to the system path
+sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
+
+# Import the init module from the utils package
+from utils import util
+
+# Get the project directory using the init module's get_project_dir function
+projectDir = util.get_project_dir()
 
 # COMMAND ----------
 
@@ -12,6 +27,17 @@ spark.conf.set(
     "spark.sql.streaming.stateStore.rocksdb.changelogCheckpointing.enabled", 
     "true"
 )
+
+# COMMAND ----------
+
+# Setup output and checkpoint paths
+envTxnOutput = f"{projectDir}/envTxnValueState/output/"
+envTxnCheckpoint = f"{projectDir}/envTxnValueState/checkpoint/"
+print("output path:", envTxnOutput)
+print("checkpt output path:",envTxnCheckpoint)
+# Clean up any existing data from previous runs
+dbutils.fs.rm(envTxnCheckpoint, True)
+dbutils.fs.rm(envTxnOutput, True)
 
 # COMMAND ----------
 
@@ -207,20 +233,9 @@ class TemperatureMonitor(StatefulProcessor):
 
 # COMMAND ----------
 
-# Setup output and checkpoint paths
-envTxnOutput = f"{projectDir}/envTxnValueState/output/"
-envTxnCheckpoint = f"{projectDir}/envTxnValueState/checkpoint/"
-print("output path:", envTxnOutput)
-print("checkpt output path:",envTxnCheckpoint)
-# Clean up any existing data from previous runs
-dbutils.fs.rm(envTxnCheckpoint, True)
-dbutils.fs.rm(envTxnOutput, True)
-
-# COMMAND ----------
-
 # Generate test data for the streaming query
 # This function is likely defined in the utils/init notebook
-test_df = generate_environmental_test_data(spark, row_count=100, rows_per_second=1)
+test_df = util.generate_environmental_test_data(spark, row_count=100, rows_per_second=1)
     
 # Create a temporary view of the test data for SQL access
 test_df.createOrReplaceTempView("sensor_readings")
@@ -247,13 +262,19 @@ query.writeStream \
 
 # COMMAND ----------
 
+# sleep 15 seconds for some data to be processed before inspecting the results.
+import time
+time.sleep(15)
+
+# COMMAND ----------
+
 # Display the results of the streaming query
 display(spark.read.format("delta").load(envTxnOutput))
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC STATE STORE DATA READER
+# MAGIC Inspect State Information with the State Store Reader Features
 
 # COMMAND ----------
 
