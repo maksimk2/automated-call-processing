@@ -108,3 +108,29 @@ To get started:
 3. Follow the steps in each notebook to ingest, process, enrich, and visualize your call center audio.
 
 For questions or customization requests, reach out to your Databricks contact or visit our [Solution Accelerators page](https://www.databricks.com/solutions/accelerators).
+
+## 📄 OSS License Review
+
+Below is a list of open source libraries used in this solution accelerator, along with their licenses and usage context.
+
+- **pydub**
+  - **License:** MIT License
+  - **Purpose:** Used for audio format conversion (e.g., `.m4a` to `.mp3`) and basic audio manipulation.
+
+- **mutagen**
+  - **License:** GNU Lesser General Public License v2.1 (LGPL-2.1)
+  - **Purpose:** Extracts audio metadata such as duration from `.mp3` files.
+
+- **openai-whisper**
+  - **License:** MIT License
+  - **Purpose:** Performs transcription of audio using OpenAI's automatic speech recognition (ASR) model.
+
+- **numpy** (>=1.24)
+  - **License:** BSD 3-Clause License
+  - **Purpose:** Fundamental numerical computing library, required as a dependency for Whisper and general data processing.
+
+---
+
+> ✅ All listed libraries are open source and compatible with commercial use.  
+> ⚠️ The LGPL license for `mutagen` may require dynamic linking or disclosure of modifications if redistributed.
+
