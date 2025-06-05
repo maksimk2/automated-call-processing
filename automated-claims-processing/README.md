@@ -11,6 +11,7 @@ This repository contains two variations of the **Databricks-powered claims proce
 ├── demo/           # Demo version for internal presentations (simulated transcriptions)
 ├── customer/       # Shareable version for customers (full pipeline using real transcription)
 ├── raw_recordings/ # sample audio recordings
+├── dashboard.json  # sample dashboard JSON template
 └── README.md
 ```
 
@@ -87,6 +88,22 @@ Use the outputs from the Gold layer to power:
 - Sentiment trends
 - Fraud alerts
 - Case summaries and auto-generated follow-up communications
+
+---
+
+## 📊 Dashboard JSON Template
+
+A sample **Databricks dashboard JSON** is included in this repository for quick deployment of visualizations powered by the Gold Layer data.
+
+### 📄 File:
+- `dashboard.json`
+
+### 📝 Instructions:
+- Import this JSON into your Databricks workspace using the dashboard import UI.
+- After import, **update the SQL `SELECT` statements** in the *Data* section of each dashboard tile to point to your actual schema and table (e.g., `samantha_wise.ai_claims_processing_clean.analysis_gold`).
+- Ensure you have permission to access the underlying Delta tables via Unity Catalog.
+
+> ⚠️ Note: This JSON is a template. It assumes table names and paths consistent with this accelerator. If you modified the table names or schema paths, you'll need to adjust the SQL accordingly after import.
 
 ---
 
