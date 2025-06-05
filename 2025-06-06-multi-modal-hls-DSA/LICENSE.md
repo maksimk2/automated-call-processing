@@ -14,6 +14,9 @@
 | qwen-vl-utils      | [Apache 2.0](https://pypi.org/project/qwen-vl-utils/)     |
 | accelerate      | [Apache 2.0](https://github.com/huggingface/accelerate/blob/main/LICENSE)     |
 
+#Model Licenses
+The ColNomic model is provided by Nomic-AI through the Apache 2.0 License. 
+See the model card and license here: https://huggingface.co/nomic-ai/colnomic-embed-multimodal-7b
 
 #Databricks License
 Copyright (2022) Databricks, Inc.
