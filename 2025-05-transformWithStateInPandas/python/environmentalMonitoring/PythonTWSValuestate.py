@@ -1,4 +1,11 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC #### 📋 Summary 
+# MAGIC
+# MAGIC This Environmental Monitoring example shows how to use Apache Spark's **transformWithStateInPandas** API for arbitrary stateful stream processing in PySpark. This notebook focuses on transformWithStateInPandas's **ValueState** capabilities to manage state values.
+
+# COMMAND ----------
+
 #install dbldatagen library that is used to generate synthetic streaming data
 !pip install dbldatagen
 
@@ -6,9 +13,6 @@
 
 # Import necessary modules for system and OS operations
 import sys, os
-
-# Append the current working directory to the system path
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), ".")))
 
 # Import the init module from the utils package
 from utils import util
