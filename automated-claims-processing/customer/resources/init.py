@@ -1,8 +1,13 @@
 # Databricks notebook source
 # DBTITLE 1,Configuration Parameters
-CATALOG = "main" ### CHANGE ME ###
-SCHEMA = "ai_claims_processing_customer" ### CHANGE ME ###
-VOLUME = 'audio_recordings'
+
+dbutils.widgets.text("CATALOG","main",label="CATALOG")
+dbutils.widgets.text("SCHEMA", "ai_claims_processing_customer",label="SCHEMA")
+dbutils.widgets.text("VOLUME", "audio_recordings",label="VOLUME")
+
+CATALOG = dbutils.widgets.get("CATALOG")
+SCHEMA = dbutils.widgets.get("SCHEMA")
+VOLUME = dbutils.widgets.get("VOLUME")
 
 BRONZE_TABLE = 'recordings_file_reference_bronze'
 SILVER_TABLE = 'transcriptions_silver'
