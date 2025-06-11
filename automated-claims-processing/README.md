@@ -100,7 +100,7 @@ A sample **Databricks dashboard JSON** is included in this repository for quick 
 
 ### 📝 Instructions:
 - Import this JSON into your Databricks workspace using the dashboard import UI.
-- After import, **update the SQL `SELECT` statements** in the *Data* section of each dashboard tile to point to your actual schema and table (e.g., `samantha_wise.ai_claims_processing_clean.analysis_gold`).
+- After import, **update the SQL `SELECT` statements** in the *Data* section of each dashboard tile to point to your actual schema and table (e.g., `main.ai_claims_processing_clean.analysis_gold`).
 - Ensure you have permission to access the underlying Delta tables via Unity Catalog.
 
 > ⚠️ Note: This JSON is a template. It assumes table names and paths consistent with this accelerator. If you modified the table names or schema paths, you'll need to adjust the SQL accordingly after import.
