@@ -1,7 +1,7 @@
 # Databricks notebook source
 # DBTITLE 1,Configuration Parameters
-CATALOG = 'samantha_wise'
-SCHEMA = 'ai_claims_processing_customer_demo'
+CATALOG = "main" ### CHANGE ME ###
+SCHEMA = "ai_claims_processing_customer" ### CHANGE ME ###
 VOLUME = 'audio_recordings'
 
 BRONZE_TABLE = 'recordings_file_reference_bronze'
