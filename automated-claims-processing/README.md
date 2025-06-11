@@ -81,6 +81,23 @@ The `customer/` directory contains the **clean version of the solution accelerat
 
 ---
 
+## 🎧 Sample Audio Recordings
+
+The repository includes a folder of **sample recordings** located in:
+
+- `raw_recordings/` 
+
+This folder contains **5 sample `.m4a` audio recordings** featuring fictional call center conversations. These files are provided **purely for demo purposes**.
+
+### 📥 Customization:
+Users are encouraged to:
+- Replace or extend these with their own `.m4a` call recordings.
+- Upload their audio files directly into the `raw_recordings` directory of the volume `audio_recordings` once created in the Bronze ingestion step.
+
+This ensures the full ETL and AI pipeline operates on your organisation's own data, providing tailored insights.
+
+---
+
 ## 📊 Visualisation
 
 Use the outputs from the Gold layer to power:
