@@ -16,6 +16,33 @@ Each notebook corresponds to a layer in the pipeline.
 
 ---
 
+## ⚙️ Configuration Required Before Running Notebooks
+
+Before executing any of the notebooks, you must configure your environment using the initialization script provided:
+
+### 📄 File:
+- `resources/init.py`
+
+This script sets up:
+- Required Databricks widgets (for selecting CATALOG, SCHEMA, VOLUME)
+- Default volume and schema paths for raw and processed audio
+- Required Delta tables and volumes (created automatically if not present)
+- A lookup table (`call_centre_reasons`) with sample classification categories
+
+### 🛠️ Instructions:
+1. Open and run `resources/init.py` at the beginning of your workflow.
+2. Provide appropriate values for the widgets:
+   - `CATALOG` – Your Unity Catalog catalog (e.g., `main`)
+   - `SCHEMA` – Your schema (e.g., `ai_claims_processing_customer`)
+   - `VOLUME` – Storage volume for audio data (e.g., `audio_recordings`)
+3. If running in a new environment, the script will automatically create:
+   - The catalog, schema, and volume (if they do not exist)
+   - A `call_centre_reasons` table with common classification labels
+
+> 🔁 This ensures your downstream ETL and AI processing notebooks are correctly parameterized and able to locate source and output paths.
+
+---
+
 ## 📁 Notebook 1: `00 ETL Bronze Layer`
 
 ### 🎯 Objective
