@@ -39,7 +39,7 @@ import pyspark.sql.functions as F
 files = dbutils.fs.ls(raw_audio_path)
 
 if not files:
-    raise ValueError(f"No files found in raw audio path: {raw_audio_path}")
+    raise ValueError(f"No files found in raw audio path: {raw_audio_path}. Please add audio files.")
 
 # Create DataFrame with metadata and normalized columns
 file_reference_df = (

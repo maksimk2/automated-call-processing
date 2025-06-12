@@ -153,6 +153,21 @@ To run the full notebook pipeline automatically when new audio files arrive, you
 
 ---
 
+---
+
+## 🖥 Recommended Cluster Configuration
+
+To ensure the notebooks (including Whisper-based transcription and AI batch inference) run efficiently, we recommend using a **Single Node ML Runtime cluster**. Below is a sample configuration:
+
+### ✅ Reference Configuration
+
+- **Databricks Runtime Version:** `16.1.x-scala2.12` (ML runtime)
+- **Node Type:** 32 vCPU, 64 GB RAM
+- **Mode:** Single Node (`num_workers = 0`)
+
+---
+
+
 ## ✅ Summary
 
 This accelerator shows how insurance and call center operations can:
