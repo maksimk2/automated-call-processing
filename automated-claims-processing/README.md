@@ -8,10 +8,11 @@ This repository contains two variations of the **Databricks-powered claims proce
 
 ```
 .
-├── demo/           # Demo version for internal presentations (simulated transcriptions)
-├── customer/       # Shareable version for customers (full pipeline using real transcription)
-├── raw_recordings/ # sample audio recordings
-├── dashboard.json  # sample dashboard JSON template
+├── demo/                                # Demo version for internal presentations (simulated transcriptions)
+├── customer/                            # Shareable version for customers (full pipeline using real transcription)
+├── raw_recordings/                      # sample audio recordings
+├── dashboard.lvdash.json                # sample dashboard JSON template
+├── automated-claims-processing-etl.yaml # Job YAML template to automate pipeline execution
 └── README.md
 ```
 
@@ -58,6 +59,8 @@ The `customer/` directory contains the **clean version of the solution accelerat
 ## 🔍 Resources
 
 - `demo/resources/generate_data.py`: Generates simulated transcription data for demo use
+- `dashboard.lvdash.json`: Dashboard template for Databricks
+- `automated-claims-processing-etl.yaml`: YAML template to create an automated Databricks job
 - Notebooks are modular and follow **Medallion Architecture (Bronze → Silver → Gold)**
 
 ---
@@ -117,10 +120,35 @@ A sample **Databricks dashboard JSON** is included in this repository for quick 
 
 ### 📝 Instructions:
 - Import this JSON into your Databricks workspace using the dashboard import UI.
-- After import, **update the SQL `SELECT` statements** in the *Data* section of each dashboard tile to point to your actual schema and table (e.g., `main.ai_claims_processing_clean.analysis_gold`).
+- After import, **update the SQL `SELECT` statements** in the *Data* section of each dashboard tile to point to your actual schema and table (e.g., `samantha_wise.ai_claims_processing_clean.analysis_gold`).
 - Ensure you have permission to access the underlying Delta tables via Unity Catalog.
 
 > ⚠️ Note: This JSON is a template. It assumes table names and paths consistent with this accelerator. If you modified the table names or schema paths, you'll need to adjust the SQL accordingly after import.
+
+---
+
+## ⚙️ Automating the Pipeline with a Databricks Job
+
+To run the full notebook pipeline automatically when new audio files arrive, you can use the provided **Databricks Job YAML template**.
+
+### 📄 File:
+- `resources/job_template.yaml`
+
+### 📝 Instructions:
+1. Use this template as a starting point to configure a Databricks Job in your workspace.
+2. **Update the following placeholders** with your own environment parameters:
+   - `<CATALOG>`, `<SCHEMA>`, `<VOLUME>` – Your Unity Catalog paths
+   - `<USERNAME>` – Your workspace email path (used in notebook paths)
+   - `<CLUSTER_ID>` – Your existing compute cluster ID
+   - `<SQL_WAREHOUSE_ID>` – ID of your SQL warehouse (for dashboard refresh)
+   - `<DASHBOARD_ID>` – ID of your dashboard
+
+3. This job will:
+   - Trigger when a new file lands in `raw_recordings/`
+   - Run the Bronze → Silver → Gold notebooks sequentially
+   - Optionally refresh a dashboard after pipeline completion
+
+> ⚠️ This is a template. Users must replace all placeholders before deployment.
 
 ---
 
@@ -139,7 +167,9 @@ This accelerator shows how insurance and call center operations can:
 To get started:
 1. Clone this repo.
 2. Choose either the `demo/` or `customer/` variation based on your audience.
-3. Follow the steps in each notebook to ingest, process, enrich, and visualize your call center audio.
+3. Run `init.py` to configure your workspace.
+4. Follow the steps in each notebook to ingest, process, enrich, and visualize your call center audio.
+5. Optionally deploy the pipeline using the provided job YAML template.
 
 For questions or customization requests, reach out to your Databricks contact or visit our [Solution Accelerators page](https://www.databricks.com/solutions/accelerators).
 

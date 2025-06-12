@@ -1,7 +1,6 @@
 # Databricks notebook source
 # DBTITLE 1,Configuration Parameters
-
-dbutils.widgets.text("CATALOG","main",label="CATALOG")
+dbutils.widgets.text("CATALOG","samantha_wise",label="CATALOG")
 dbutils.widgets.text("SCHEMA", "ai_claims_processing_customer",label="SCHEMA")
 dbutils.widgets.text("VOLUME", "audio_recordings",label="VOLUME")
 

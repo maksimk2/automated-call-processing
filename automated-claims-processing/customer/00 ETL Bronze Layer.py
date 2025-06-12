@@ -22,9 +22,14 @@ dbutils.library.restartPython()
 # COMMAND ----------
 
 # DBTITLE 1,Ensure directory exists in Volume
-if dbutils.fs.mkdirs(raw_audio_path):
-    if not dbutils.fs.ls(raw_audio_path):
-        dbutils.notebook.exit(f"Warning: The directory {raw_audio_path} is empty. Please add audio files.")
+try:
+    dbutils.fs.ls(raw_audio_path)
+except Exception as e:
+    if "java.io.FileNotFoundException" in str(e):
+        dbutils.fs.mkdirs(raw_audio_path)
+        dbutils.notebook.exit(f"Warning: The directory {raw_audio_path} was created and is empty. Please add audio files.")
+    else:
+        raise e
 
 # COMMAND ----------
 
