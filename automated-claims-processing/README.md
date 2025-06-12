@@ -8,12 +8,13 @@ This repository contains two variations of the **Databricks-powered claims proce
 
 ```
 .
-├── demo/                                # Demo version for internal presentations (simulated transcriptions)
 ├── customer/                            # Shareable version for customers (full pipeline using real transcription)
+├── demo/                                # Demo version for internal presentations (simulated transcriptions)
 ├── raw_recordings/                      # sample audio recordings
-├── dashboard.lvdash.json                # sample dashboard JSON template
+├── LICENSE.txt
+├── README.md
 ├── automated-claims-processing-etl.yaml # Job YAML template to automate pipeline execution
-└── README.md
+└── dashboard.lvdash.json                # sample dashboard JSON template
 ```
 
 ---
@@ -132,7 +133,7 @@ A sample **Databricks dashboard JSON** is included in this repository for quick 
 To run the full notebook pipeline automatically when new audio files arrive, you can use the provided **Databricks Job YAML template**.
 
 ### 📄 File:
-- `resources/job_template.yaml`
+- `automated-claims-processing-etl.yaml`
 
 ### 📝 Instructions:
 1. Use this template as a starting point to configure a Databricks Job in your workspace.
