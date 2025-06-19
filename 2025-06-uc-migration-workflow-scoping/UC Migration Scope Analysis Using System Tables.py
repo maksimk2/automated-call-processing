@@ -18,7 +18,7 @@
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE WIDGET TEXT WorkspaceID;
+# MAGIC CREATE WIDGET TEXT WorkspaceID DEFAULT '';
 
 # COMMAND ----------
 
