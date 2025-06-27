@@ -1,6 +1,6 @@
 # `Chemprop` on Databricks
 [Chemprop](https://pubs.acs.org/doi/10.1021/acs.jcim.3c01250) is a chemical property prediction package popular among pharma cheminformaticians for designing drugs with desirable molecular properties.<br>
-This repo provides example notebooks for running Chemprop on Databricks. See accompanying [blog](https://docs.google.com/document/d/1_iZPss2I3KNUgfWXPlicO_xtSB1Bjq1C3qZfiRTjKCo/edit?tab=t.0).
+This repo provides example notebooks for running Chemprop on Databricks. See accompanying blog, [AI Drug Discovery Made Easy: Your Complete Guide to Chemprop on Databricks](https://community.databricks.com/t5/technical-blog/ai-drug-discovery-made-easy-your-complete-guide-to-chemprop-on/ba-p/111750).
 
 ## Setup
 `pip install chemprop rdkit-pypi`
