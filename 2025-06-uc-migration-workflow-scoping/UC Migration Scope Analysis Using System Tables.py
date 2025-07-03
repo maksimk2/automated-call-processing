@@ -31,7 +31,8 @@
 # MAGIC SELECT DISTINCT 
 # MAGIC     job_id AS job_id,
 # MAGIC     workspace_id,
-# MAGIC     name
+# MAGIC     name,
+# MAGIC     creator_id
 # MAGIC FROM  
 # MAGIC     system.lakeflow.jobs 
 # MAGIC WHERE 
@@ -62,7 +63,8 @@
 # MAGIC             name,
 # MAGIC             change_time,
 # MAGIC             FIRST_VALUE(change_time) OVER (PARTITION BY job_id ORDER BY change_time ASC) AS created_date,
-# MAGIC             FIRST_VALUE(name) OVER (PARTITION BY job_id ORDER BY change_time DESC) AS latest_name
+# MAGIC             FIRST_VALUE(name) OVER (PARTITION BY job_id ORDER BY change_time DESC) AS latest_name,
+# MAGIC             creator_id
 # MAGIC         FROM  
 # MAGIC             system.lakeflow.jobs 
 # MAGIC         WHERE 
@@ -79,7 +81,8 @@
 # MAGIC         job_id,
 # MAGIC         created_date,
 # MAGIC         workspace_id,
-# MAGIC         latest_name
+# MAGIC         latest_name,
+# MAGIC         creator_id
 # MAGIC     FROM
 # MAGIC         created_date
 # MAGIC )
@@ -401,6 +404,43 @@
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC ## 7. Add User Data 
+
+# COMMAND ----------
+
+from databricks.sdk import WorkspaceClient
+from databricks.sdk.service import iam
+from pyspark.sql.types import StructType, StructField, StringType
+
+w = WorkspaceClient()
+
+# COMMAND ----------
+
+all_users = w.users.list(
+    attributes="id,userName, display_name, emails",
+    sort_by="userName",
+    sort_order=iam.ListSortOrder.DESCENDING,
+)
+
+user_email_list = [
+    {"id": u.id, "user_name": u.user_name, "display_name": u.display_name, "email": u.emails[0].value if u.emails else None} 
+    for u in all_users
+]
+
+schema = StructType([
+    StructField("id", StringType(), True),
+    StructField("user_name", StringType(), True),
+    StructField("display_name", StringType(), True),
+    StructField("email", StringType(), True)
+])
+
+all_users_df = spark.createDataFrame(user_email_list, schema)
+all_users_df.createOrReplaceTempView("all_users_view")
+display(all_users_df)
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC # 7. Bringing it all together
 
 # COMMAND ----------
@@ -420,7 +460,9 @@
 # MAGIC SELECT 
 # MAGIC     lj.*, 
 # MAGIC     jca.*, 
-# MAGIC     cor.*
+# MAGIC     cor.*,
+# MAGIC     auv.user_name
+# MAGIC
 # MAGIC FROM 
 # MAGIC     list_of_jobs lj
 # MAGIC INNER JOIN 
@@ -435,6 +477,9 @@
 # MAGIC LEFT ANTI JOIN 
 # MAGIC     uc_job_run_compute ujrc
 # MAGIC     ON lj.job_id = ujrc.job_id
+# MAGIC LEFT JOIN
+# MAGIC     all_users_view auv
+# MAGIC     ON lj.creator_id = auv.id
 # MAGIC ORDER BY 
 # MAGIC     jca.list_cost DESC,  
 # MAGIC     cor.Total_Runs DESC, 
@@ -466,7 +511,8 @@
 # MAGIC     cor.q2_2025_Runs, 
 # MAGIC     cor.q2_2025_list_cost,
 # MAGIC     cor.earliest_execution_time, 
-# MAGIC     cor.latest_execution_time
+# MAGIC     cor.latest_execution_time,
+# MAGIC     auv.user_name
 # MAGIC FROM 
 # MAGIC     list_of_jobs lj
 # MAGIC INNER JOIN 
@@ -481,6 +527,9 @@
 # MAGIC LEFT ANTI JOIN 
 # MAGIC     uc_job_run_compute ujrc
 # MAGIC     ON lj.job_id = ujrc.job_id
+# MAGIC LEFT JOIN
+# MAGIC     all_users_view auv
+# MAGIC     ON lj.creator_id = auv.id
 # MAGIC ORDER BY 
 # MAGIC     jca.list_cost DESC,  
 # MAGIC     cor.Total_Runs DESC, 
