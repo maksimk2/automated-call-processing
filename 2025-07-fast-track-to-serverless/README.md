@@ -20,7 +20,9 @@ A command-line utility for converting Databricks Lakeflow Declarative Pipelines 
 
 ## Prerequisites
 
-- Python 3.8 or higher
+- Dependencies:
+  - Python 3.8
+  - databricks-sdk=0.47.0. Future SDK releases could be compatible, but they have to be tested by the user.
 - Access to the target Databricks workspaces
 - Service principal with the following permissions:
   - Billing Admin, to allow the creation and management of new budget policies
