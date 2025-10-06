@@ -17,7 +17,7 @@ dbutils.library.restartPython()
 # COMMAND ----------
 
 # DBTITLE 1,Configuration Parameters
-# MAGIC %run "./resources/init" 
+# MAGIC %run "./init" 
 
 # COMMAND ----------
 
@@ -55,27 +55,42 @@ display(file_reference_df)
 # DBTITLE 1,Create or Update Bronze Delta Table
 bronze_table_name = f"{CATALOG}.{SCHEMA}.{BRONZE_TABLE}"
 
-if not spark._jsparkSession.catalog().tableExists(bronze_table_name):
-    # First run: overwrite table
+if not spark.catalog.tableExists(bronze_table_name):
+    # First run: create table
     file_reference_df.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable(bronze_table_name)
+    print(f"✅ Bronze table created with {file_reference_df.count()} files")
 else:
-    # Subsequent runs: deduplicate against metadata
+    # Subsequent runs: deduplicate against metadata (if it exists)
     meta_table_name = f"{CATALOG}.{SCHEMA}.{META_TABLE}"
 
-    if not spark._jsparkSession.catalog().tableExists(meta_table_name):
-        raise ValueError("Metadata table does not exist. Run pipeline from scratch or create meta_data table.")
-
-    metadata_df = spark.table(meta_table_name)
-
-    # Join to find new files not already marked as 'processed'
-    new_files_df = file_reference_df.join(
-        metadata_df.filter(F.col("processed") == True), 
-        on="file_name", 
-        how="left_anti"
-    )
-
-    if new_files_df.count() > 0:
-        new_files_df.select(file_reference_df.columns).write.mode("append").saveAsTable(bronze_table_name)
+    if spark.catalog.tableExists(meta_table_name):
+        # Metadata exists - only add unprocessed files
+        metadata_df = spark.table(meta_table_name)
+        
+        # Find new files not already marked as 'processed'
+        new_files_df = file_reference_df.join(
+            metadata_df.filter(F.col("processed") == True), 
+            on="file_name", 
+            how="left_anti"
+        )
+        
+        if new_files_df.count() > 0:
+            new_files_df.select(file_reference_df.columns).write.mode("append").saveAsTable(bronze_table_name)
+            print(f"✅ Added {new_files_df.count()} new files to Bronze table")
+        else:
+            print("ℹ️ No new files to add")
+    else:
+        # Metadata doesn't exist yet (first run) - add all files
+        print("ℹ️ Metadata table doesn't exist yet - adding all files to Bronze")
+        new_files_df = file_reference_df.join(
+            spark.table(bronze_table_name).select("file_name"), 
+            on="file_name", 
+            how="left_anti"
+        )
+        
+        if new_files_df.count() > 0:
+            new_files_df.select(file_reference_df.columns).write.mode("append").saveAsTable(bronze_table_name)
+            print(f"✅ Added {new_files_df.count()} new files to Bronze table")
 
 # COMMAND ----------
 

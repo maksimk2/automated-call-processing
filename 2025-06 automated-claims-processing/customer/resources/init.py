@@ -1,6 +1,6 @@
 # Databricks notebook source
 # DBTITLE 1,Configuration Parameters
-dbutils.widgets.text("CATALOG","samantha_wise",label="CATALOG")
+dbutils.widgets.text("CATALOG","maxk_catalog",label="CATALOG")
 dbutils.widgets.text("SCHEMA", "ai_claims_processing_customer",label="SCHEMA")
 dbutils.widgets.text("VOLUME", "audio_recordings",label="VOLUME")
 
@@ -22,8 +22,13 @@ MP3_DIR = 'mp3_audio_recordings'
 raw_audio_path = f"/Volumes/{CATALOG}/{SCHEMA}/{VOLUME}/{RAW_DIR}/"
 mp3_audio_path = f"/Volumes/{CATALOG}/{SCHEMA}/{VOLUME}/{MP3_DIR}/"
 
-# Optional: Default LLM endpoint (used later in pipeline stages)
-ENDPOINT_NAME = "databricks-meta-llama-3-3-70b-instruct"
+# Optional: Default LLM endpoint (not currently used - reserved for future AI enrichment)
+# ENDPOINT_NAME = "databricks-meta-llama-3-3-70b-instruct"
+
+# Whisper transcription configuration
+WHISPER_MODEL_SIZE = "base"  # Options: tiny, base, small, medium, large
+WHISPER_LANGUAGE = "en"  # Language code: en (English), nl (Dutch), de (German), fr (French), etc.
+                          # Set to None for auto-detection (slower but works for mixed languages)
 
 # COMMAND ----------
 
@@ -39,7 +44,7 @@ spark.sql(f"CREATE VOLUME IF NOT EXISTS `{CATALOG}`.`{SCHEMA}`.`{VOLUME}`")
 # DBTITLE 1,Map Call Reasons to Next Steps and Save as Table
 call_center_reasons_table_name = f"{CATALOG}.{SCHEMA}.{CALL_CENTER_REASONS_TABLE}"
 
-if not spark._jsparkSession.catalog().tableExists(call_center_reasons_table_name):
+if not spark.catalog.tableExists(call_center_reasons_table_name):
   from pyspark.sql.functions import when
 
   reasons_dict = {

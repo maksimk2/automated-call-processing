@@ -23,7 +23,7 @@ dbutils.library.restartPython()
 # COMMAND ----------
 
 # DBTITLE 1,Load Initial Resources for Notebook Execution
-# MAGIC %run "./resources/init" 
+# MAGIC %run "./init" 
 
 # COMMAND ----------
 
@@ -31,7 +31,7 @@ dbutils.library.restartPython()
 silver_df = spark.table(f"{CATALOG}.{SCHEMA}.{SILVER_TABLE}")
 meta_path = f"{CATALOG}.{SCHEMA}.{META_TABLE}"
 
-if spark._jsparkSession.catalog().tableExists(meta_path):
+if spark.catalog.tableExists(meta_path):
     processed_df = spark.table(meta_path).filter("processed = True")
     df = silver_df.join(processed_df, "file_name", "left_anti")
 else:
@@ -124,8 +124,8 @@ SELECT *,
        ai_analyze_sentiment(transcription) AS sentiment,
        ai_summarize(transcription) AS summary,
        ai_classify(transcription, ARRAY({reasons_sql})) AS classification,
-       ai_extract(transcription, ARRAY({ner_sql})) AS ner,
-       ai_query('{ENDPOINT_NAME}', CONCAT('{prompt}', transcription), responseFormat => '{response_format}') AS email_response
+       ai_extract(transcription, ARRAY({ner_sql})) AS ner
+       -- Removed ai_query() - not needed for raw text output
 FROM transcriptions_temp
 """
 
@@ -162,7 +162,7 @@ display(flattened_df)
 # DBTITLE 1,Write Gold Layer Table
 gold_table_path = f"{CATALOG}.{SCHEMA}.{GOLD_TABLE}"
 
-if not spark._jsparkSession.catalog().tableExists(gold_table_path):
+if not spark.catalog.tableExists(gold_table_path):
     flattened_df.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable(gold_table_path)
 else:
     flattened_df.write.mode("append").saveAsTable(gold_table_path)
@@ -176,7 +176,7 @@ from pyspark.sql.functions import lit
 
 file_names_df = flattened_df.select("file_name").distinct().withColumn("processed", lit(True))
 
-if spark._jsparkSession.catalog().tableExists(meta_path):
+if spark.catalog.tableExists(meta_path):
     current_meta_df = spark.table(meta_path)
     updated_meta_df = current_meta_df.unionByName(file_names_df).dropDuplicates(["file_name"])
 else:
